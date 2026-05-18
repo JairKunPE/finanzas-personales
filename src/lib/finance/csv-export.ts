@@ -17,8 +17,8 @@ function formatDateSpanish(dateStr: string) {
   }
 }
 
-export function exportableTransactions(query: TransactionQuery) {
-  const all = allTransactionsWithCategories();
+export async function exportableTransactions(query: TransactionQuery) {
+  const all = await allTransactionsWithCategories();
   const filtered = filterTransactionsInMemory(all, query);
 
   return filtered.map((t) => ({
@@ -46,8 +46,8 @@ function filterTransactionsInMemory(transactions: TransactionRow[], query: Trans
   });
 }
 
-export function exportableFixedExpenses() {
-  const { items } = listFixedExpenses();
+export async function exportableFixedExpenses() {
+  const { items } = await listFixedExpenses();
 
   return items.map((e) => ({
     Descripcion: e.description,
@@ -63,10 +63,12 @@ export function exportableFixedExpenses() {
   }));
 }
 
-export function generateTransactionsCsv(query: TransactionQuery) {
-  return toCsv(exportableTransactions(query));
+export async function generateTransactionsCsv(query: TransactionQuery) {
+  const rows = await exportableTransactions(query);
+  return toCsv(rows);
 }
 
-export function generateFixedExpensesCsv() {
-  return toCsv(exportableFixedExpenses());
+export async function generateFixedExpensesCsv() {
+  const rows = await exportableFixedExpenses();
+  return toCsv(rows);
 }

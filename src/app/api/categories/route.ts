@@ -10,14 +10,14 @@ function validationError(error: ZodError) {
   return NextResponse.json({ message: "Datos invalidos", issues: error.issues.map((issue) => issue.message) }, { status: 400 });
 }
 
-export function GET() {
-  return NextResponse.json(listActiveCategories());
+export async function GET() {
+  return NextResponse.json(await listActiveCategories());
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const parsed = categoryInputSchema.safeParse(body);
   if (!parsed.success) return validationError(parsed.error);
-  const category = createCategory(parsed.data);
+  const category = await createCategory(parsed.data);
   return NextResponse.json(category, { status: 201 });
 }

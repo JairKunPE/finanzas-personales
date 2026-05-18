@@ -9,8 +9,8 @@ import { listFixedExpenses } from "@/lib/db/transactions";
 
 export const dynamic = "force-dynamic";
 
-export default function FixedExpensesPage() {
-  const data = listFixedExpenses();
+export default async function FixedExpensesPage() {
+  const data = await listFixedExpenses();
   const groups = ["Servicios", "Suscripciones digitales", "Otros"] as const;
 
   return (

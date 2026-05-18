@@ -12,20 +12,20 @@ export type CurrencySettings = {
   updatedAt: string;
 };
 
-export function getCurrencySettings(): CurrencySettings {
-  const row = db.select().from(settings).where(eq(settings.key, USD_TO_PEN_KEY)).get();
+export async function getCurrencySettings(): Promise<CurrencySettings> {
+  const rows = await db.select().from(settings).where(eq(settings.key, USD_TO_PEN_KEY)).limit(1);
+  const row = rows[0];
   if (!row) {
     return setUsdToPen(DEFAULT_USD_TO_PEN);
   }
   return { baseCurrency: "PEN", usdToPen: Number(row.value), updatedAt: row.updatedAt };
 }
 
-export function setUsdToPen(rate: number): CurrencySettings {
+export async function setUsdToPen(rate: number): Promise<CurrencySettings> {
   const updatedAt = nowISO();
-  db.insert(settings)
+  await db.insert(settings)
     .values({ key: USD_TO_PEN_KEY, value: String(rate), updatedAt })
-    .onConflictDoUpdate({ target: settings.key, set: { value: String(rate), updatedAt } })
-    .run();
+    .onConflictDoUpdate({ target: settings.key, set: { value: String(rate), updatedAt } });
   return { baseCurrency: "PEN", usdToPen: rate, updatedAt };
 }
 

@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
   const params = await searchParams;
   const selectedMonth = params.month ?? currentMonthKey();
-  const summary = getDashboardSummary(selectedMonth);
+  const summary = await getDashboardSummary(selectedMonth);
 
   return (
     <div className="space-y-6">

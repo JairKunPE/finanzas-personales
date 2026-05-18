@@ -16,27 +16,28 @@ export type BudgetWithSpent = {
   status: "safe" | "warning" | "over" | "no-budget";
 };
 
-export function getBudgetForMonth(categoryId: number, month: string) {
-  return db.select().from(budgets).where(and(eq(budgets.categoryId, categoryId), eq(budgets.month, month))).get();
+export async function getBudgetForMonth(categoryId: number, month: string) {
+  const rows = await db.select().from(budgets).where(and(eq(budgets.categoryId, categoryId), eq(budgets.month, month))).limit(1);
+  return rows[0];
 }
 
-export function upsertBudget(categoryId: number, month: string, limitAmount: number) {
-  const existing = getBudgetForMonth(categoryId, month);
+export async function upsertBudget(categoryId: number, month: string, limitAmount: number) {
+  const existing = await getBudgetForMonth(categoryId, month);
   if (existing) {
-    db.update(budgets).set({ limitAmount, updatedAt: nowISO() }).where(eq(budgets.id, existing.id)).run();
+    await db.update(budgets).set({ limitAmount, updatedAt: nowISO() }).where(eq(budgets.id, existing.id));
     return { ...existing, limitAmount } as const;
   }
-  const result = db.insert(budgets).values({ categoryId, month, limitAmount, createdAt: nowISO() }).run();
-  return { id: Number(result.lastInsertRowid), categoryId, month, limitAmount };
+  const [budget] = await db.insert(budgets).values({ categoryId, month, limitAmount, createdAt: nowISO() }).returning();
+  return budget;
 }
 
-export function ensureMonthBudgets(month: string) {
+export async function ensureMonthBudgets(month: string) {
   const prevMonth = getPreviousMonth(month);
-  const prevBudgets = db.select().from(budgets).where(eq(budgets.month, prevMonth)).all();
+  const prevBudgets = await db.select().from(budgets).where(eq(budgets.month, prevMonth));
   for (const b of prevBudgets) {
-    const existing = getBudgetForMonth(b.categoryId, month);
+    const existing = await getBudgetForMonth(b.categoryId, month);
     if (!existing) {
-      db.insert(budgets).values({ categoryId: b.categoryId, month, limitAmount: b.limitAmount, createdAt: nowISO() }).run();
+      await db.insert(budgets).values({ categoryId: b.categoryId, month, limitAmount: b.limitAmount, createdAt: nowISO() });
     }
   }
 }
@@ -47,27 +48,26 @@ function getPreviousMonth(month: string) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-export function listBudgetsWithSpent(month: string) {
-  seedDefaultCategories();
-  ensureMonthBudgets(month);
+export async function listBudgetsWithSpent(month: string) {
+  await seedDefaultCategories();
+  await ensureMonthBudgets(month);
 
   const start = `${month}-01`;
   const end = `${month}-31`;
 
-  const spentByCategory = db
+  const spentByCategory = await db
     .select({
       categoryId: transactions.categoryId,
       total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)`,
     })
     .from(transactions)
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, start), lte(transactions.date, end)))
-    .groupBy(transactions.categoryId)
-    .all();
+    .groupBy(transactions.categoryId);
 
   const spentMap = new Map(spentByCategory.map((row) => [row.categoryId, row.total]));
 
-  const allCats = db.select().from(categories).where(isNull(categories.deletedAt)).orderBy(asc(categories.name)).all();
-  const budgetRows = db.select().from(budgets).where(eq(budgets.month, month)).all();
+  const allCats = await db.select().from(categories).where(isNull(categories.deletedAt)).orderBy(asc(categories.name));
+  const budgetRows = await db.select().from(budgets).where(eq(budgets.month, month));
   const budgetMap = new Map(budgetRows.map((b) => [b.categoryId, b]));
 
   const result: BudgetWithSpent[] = [];
@@ -100,9 +100,9 @@ export function listBudgetsWithSpent(month: string) {
   return result;
 }
 
-export function countBudgetCategoriesNeedingAttention() {
+export async function countBudgetCategoriesNeedingAttention() {
   const now = new Date();
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const budgetsWithSpent = listBudgetsWithSpent(month);
+  const budgetsWithSpent = await listBudgetsWithSpent(month);
   return budgetsWithSpent.filter((b) => b.status === "warning" || b.status === "over").length;
 }

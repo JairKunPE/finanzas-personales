@@ -5,8 +5,8 @@ import { currencySettingsSchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  return NextResponse.json(getCurrencySettings());
+export async function GET() {
+  return NextResponse.json(await getCurrencySettings());
 }
 
 export async function PATCH(request: NextRequest) {
@@ -15,5 +15,5 @@ export async function PATCH(request: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ message: "Tipo de cambio invalido", issues: parsed.error.issues.map((issue) => issue.message) }, { status: 400 });
   }
-  return NextResponse.json(setUsdToPen(parsed.data.usdToPen));
+  return NextResponse.json(await setUsdToPen(parsed.data.usdToPen));
 }

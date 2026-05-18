@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const validPeriods = new Set(["monthly", "quarterly", "semiannual", "annual"]);
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const period = request.nextUrl.searchParams.get("period") ?? "monthly";
   const year = Number(request.nextUrl.searchParams.get("year")) || new Date().getFullYear();
   const monthParam = request.nextUrl.searchParams.get("month");
@@ -16,7 +16,7 @@ export function GET(request: NextRequest) {
     return NextResponse.json({ message: "Periodo invalido" }, { status: 400 });
   }
 
-  const csv = generateReportCsv(period as PeriodType, year, monthParam ? Number(monthParam) : undefined);
+  const csv = await generateReportCsv(period as PeriodType, year, monthParam ? Number(monthParam) : undefined);
 
   return new NextResponse(csv, {
     headers: {

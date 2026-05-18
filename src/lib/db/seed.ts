@@ -4,15 +4,19 @@ import { db, nowISO } from "@/lib/db";
 import { categories } from "@/lib/db/schema";
 import { defaultCategories } from "@/lib/finance/categories";
 
-export function seedDefaultCategories() {
+export async function seedDefaultCategories() {
   for (const category of defaultCategories) {
-    const existing = db.select().from(categories).where(eq(categories.name, category.name)).get();
+    const existingRows = await db.select().from(categories).where(eq(categories.name, category.name)).limit(1);
+    const existing = existingRows[0];
     if (!existing) {
-      db.insert(categories).values({ ...category, isDefault: true, createdAt: nowISO() }).run();
+      await db.insert(categories).values({ ...category, isDefault: true, createdAt: nowISO() });
     }
   }
 }
 
 if (process.env.RUN_DB_SEED === "true") {
-  seedDefaultCategories();
+  seedDefaultCategories().then(() => {
+    console.log("Seeded default categories");
+    process.exit(0);
+  });
 }

@@ -47,10 +47,10 @@ function filters(query: Partial<TransactionQuery>) {
   );
 }
 
-export function listTransactions(query: TransactionQuery) {
+export async function listTransactions(query: TransactionQuery) {
   const where = filters(query);
   const offset = (query.page - 1) * query.pageSize;
-  const items = db
+  const items = await db
     .select({
       id: transactions.id,
       type: transactions.type,
@@ -76,15 +76,14 @@ export function listTransactions(query: TransactionQuery) {
     .where(where)
     .orderBy(desc(transactions.date), desc(transactions.id))
     .limit(query.pageSize)
-    .offset(offset)
-    .all();
+    .offset(offset);
 
-  const total = db.select({ value: count() }).from(transactions).where(where).get()?.value ?? 0;
-  return { items, page: query.page, pageSize: query.pageSize, total };
+  const totalRows = await db.select({ value: count() }).from(transactions).where(where).limit(1);
+  return { items, page: query.page, pageSize: query.pageSize, total: totalRows[0]?.value ?? 0 };
 }
 
-export function getTransaction(id: number) {
-  return db
+export async function getTransaction(id: number) {
+  const rows = await db
     .select({
       id: transactions.id,
       type: transactions.type,
@@ -108,30 +107,32 @@ export function getTransaction(id: number) {
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(eq(transactions.id, id))
-    .get();
+    .limit(1);
+  return rows[0];
 }
 
-export function createTransaction(input: TransactionInput) {
+export async function createTransaction(input: TransactionInput) {
   const exchangeRate = input.currency === "USD" ? (input.exchangeRate ?? 1) : 1;
   const amountPen = convertToPen(input.amount, input.currency, exchangeRate);
   const nextBillingDate = input.isRecurring && input.billingCycle ? calculateNextBillingDate(input.date, input.billingCycle) : null;
-  const result = db.insert(transactions).values({ ...input, originalAmount: input.amount, exchangeRate, amountPen, nextBillingDate, createdAt: nowISO() }).run();
-  return getTransaction(Number(result.lastInsertRowid));
+  const [inserted] = await db.insert(transactions).values({ ...input, originalAmount: input.amount, exchangeRate, amountPen, nextBillingDate, createdAt: nowISO() }).returning();
+  return getTransaction(inserted.id);
 }
 
-export function updateTransaction(id: number, input: TransactionInput) {
+export async function updateTransaction(id: number, input: TransactionInput) {
   const exchangeRate = input.currency === "USD" ? (input.exchangeRate ?? 1) : 1;
   const amountPen = convertToPen(input.amount, input.currency, exchangeRate);
   const nextBillingDate = input.isRecurring && input.billingCycle ? calculateNextBillingDate(input.date, input.billingCycle) : null;
-  db.update(transactions).set({ ...input, originalAmount: input.amount, exchangeRate, amountPen, nextBillingDate, updatedAt: nowISO() }).where(eq(transactions.id, id)).run();
+  await db.update(transactions).set({ ...input, originalAmount: input.amount, exchangeRate, amountPen, nextBillingDate, updatedAt: nowISO() }).where(eq(transactions.id, id));
   return getTransaction(id);
 }
 
-export function deleteTransaction(id: number) {
-  return db.delete(transactions).where(eq(transactions.id, id)).run().changes > 0;
+export async function deleteTransaction(id: number) {
+  const result = await db.delete(transactions).where(eq(transactions.id, id));
+  return (result as { rowCount: number }).rowCount > 0;
 }
 
-export function recentTransactions(limit = 5) {
+export async function recentTransactions(limit = 5) {
   return db
     .select({
       id: transactions.id,
@@ -156,15 +157,14 @@ export function recentTransactions(limit = 5) {
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .orderBy(desc(transactions.date), desc(transactions.id))
-    .limit(limit)
-    .all();
+    .limit(limit);
 }
 
-export function allTransactionsAscending() {
-  return db.select().from(transactions).orderBy(asc(transactions.date)).all();
+export async function allTransactionsAscending() {
+  return db.select().from(transactions).orderBy(asc(transactions.date));
 }
 
-export function allTransactionsWithCategories() {
+export async function allTransactionsWithCategories() {
   return db
     .select({
       id: transactions.id,
@@ -188,12 +188,11 @@ export function allTransactionsWithCategories() {
     })
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
-    .orderBy(asc(transactions.date))
-    .all();
+    .orderBy(asc(transactions.date));
 }
 
-export function listFixedExpenses() {
-  const rows = db
+export async function listFixedExpenses() {
+  const rows = await db
     .select({
       id: transactions.id,
       type: transactions.type,
@@ -217,8 +216,7 @@ export function listFixedExpenses() {
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(and(eq(transactions.type, "expense"), eq(transactions.isRecurring, true), isNotNull(transactions.billingCycle)))
-    .orderBy(asc(transactions.nextBillingDate), asc(transactions.description))
-    .all();
+    .orderBy(asc(transactions.nextBillingDate), asc(transactions.description));
 
   const items = rows.map((row) => {
     const billingCycle = row.billingCycle as BillingCycle;
@@ -246,33 +244,31 @@ function categorizeFixedExpense(categoryName: string, description: string): "Ser
   return "Otros";
 }
 
-export function currentMonthTotals(month: string) {
+export async function currentMonthTotals(month: string) {
   const start = `${month}-01`;
   const end = `${month}-31`;
   return db
     .select({ type: transactions.type, total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)` })
     .from(transactions)
     .where(and(gte(transactions.date, start), lte(transactions.date, end)))
-    .groupBy(transactions.type)
-    .all();
+    .groupBy(transactions.type);
 }
 
-export function currentMonthFixedVariableTotals(month: string) {
+export async function currentMonthFixedVariableTotals(month: string) {
   const start = `${month}-01`;
   const end = `${month}-31`;
-  const rows = db
+  const rows = await db
     .select({ isRecurring: transactions.isRecurring, total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)` })
     .from(transactions)
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, start), lte(transactions.date, end)))
-    .groupBy(transactions.isRecurring)
-    .all();
+    .groupBy(transactions.isRecurring);
   return {
     fixed: rows.find((row) => row.isRecurring)?.total ?? 0,
     variable: rows.find((row) => !row.isRecurring)?.total ?? 0,
   };
 }
 
-export function expenseDistribution(month: string) {
+export async function expenseDistribution(month: string) {
   const start = `${month}-01`;
   const end = `${month}-31`;
   return db
@@ -280,6 +276,5 @@ export function expenseDistribution(month: string) {
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, start), lte(transactions.date, end)))
-    .groupBy(categories.id)
-    .all();
+    .groupBy(categories.id);
 }

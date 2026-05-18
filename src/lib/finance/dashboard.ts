@@ -3,10 +3,11 @@ import { calculateBalancePen, calculateMonthlyTotals } from "@/lib/finance/calcu
 import { countBudgetCategoriesNeedingAttention } from "@/lib/db/budgets";
 import { allTransactionsAscending, currentMonthFixedVariableTotals, currentMonthTotals, expenseDistribution, recentTransactions } from "@/lib/db/transactions";
 
-export function getDashboardSummary(month = currentMonthKey()) {
-  const allTransactions = allTransactionsAscending();
-  const monthly = calculateMonthlyTotals(currentMonthTotals(month));
-  const fixedVariable = currentMonthFixedVariableTotals(month);
+export async function getDashboardSummary(month = currentMonthKey()) {
+  const allTransactions = await allTransactionsAscending();
+  const monthlyTotals = await currentMonthTotals(month);
+  const monthly = calculateMonthlyTotals(monthlyTotals);
+  const fixedVariable = await currentMonthFixedVariableTotals(month);
   return {
     month,
     balance: calculateBalancePen(allTransactions),
@@ -14,8 +15,8 @@ export function getDashboardSummary(month = currentMonthKey()) {
     monthlyExpenses: monthly.expenses,
     fixedExpenses: fixedVariable.fixed,
     variableExpenses: fixedVariable.variable,
-    expenseDistribution: expenseDistribution(month),
-    latestTransactions: recentTransactions(5),
-    budgetAttentionCount: countBudgetCategoriesNeedingAttention(),
+    expenseDistribution: await expenseDistribution(month),
+    latestTransactions: await recentTransactions(5),
+    budgetAttentionCount: await countBudgetCategoriesNeedingAttention(),
   };
 }

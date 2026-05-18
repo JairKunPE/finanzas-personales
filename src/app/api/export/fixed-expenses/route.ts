@@ -4,8 +4,8 @@ import { generateFixedExpensesCsv } from "@/lib/finance/csv-export";
 
 export const dynamic = "force-dynamic";
 
-export function POST() {
-  const csv = generateFixedExpensesCsv();
+export async function POST() {
+  const csv = await generateFixedExpensesCsv();
 
   const now = new Date();
   const filename = `finanzas_gastos-fijos_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}.csv`;

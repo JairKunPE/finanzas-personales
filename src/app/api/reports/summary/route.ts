@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const validPeriods = new Set(["monthly", "quarterly", "semiannual", "annual"]);
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const period = request.nextUrl.searchParams.get("period") ?? "monthly";
   const year = Number(request.nextUrl.searchParams.get("year")) || new Date().getFullYear();
   const monthParam = request.nextUrl.searchParams.get("month");
@@ -16,12 +16,12 @@ export function GET(request: NextRequest) {
     return NextResponse.json({ message: "Periodo invalido" }, { status: 400 });
   }
 
-  const summary = getReportSummary(period as PeriodType, year, monthParam ? Number(monthParam) : undefined);
-  const evolution = getMonthlyEvolution(summary.range.startDate, summary.range.endDate);
-  const breakdown = getCategoryBreakdown(summary.range.startDate, summary.range.endDate);
-  const topCategories = getTopCategories(summary.range.startDate, summary.range.endDate);
-  const fixedVariable = getFixedVsVariable(summary.range.startDate, summary.range.endDate);
-  const monthlyBalance = getMonthlyBalance(summary.range.startDate, summary.range.endDate);
+  const summary = await getReportSummary(period as PeriodType, year, monthParam ? Number(monthParam) : undefined);
+  const evolution = await getMonthlyEvolution(summary.range.startDate, summary.range.endDate);
+  const breakdown = await getCategoryBreakdown(summary.range.startDate, summary.range.endDate);
+  const topCategories = await getTopCategories(summary.range.startDate, summary.range.endDate);
+  const fixedVariable = await getFixedVsVariable(summary.range.startDate, summary.range.endDate);
+  const monthlyBalance = await getMonthlyBalance(summary.range.startDate, summary.range.endDate);
 
   return NextResponse.json({ summary, evolution, breakdown, topCategories, fixedVariable, monthlyBalance });
 }

@@ -42,22 +42,21 @@ export function getPeriodRange(period: PeriodType, year: number, month?: number)
   };
 }
 
-function periodTotals(startDate: string, endDate: string) {
-  const rows = db
+async function periodTotals(startDate: string, endDate: string) {
+  const rows = await db
     .select({ type: transactions.type, total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)` })
     .from(transactions)
     .where(and(gte(transactions.date, startDate), lte(transactions.date, endDate)))
-    .groupBy(transactions.type)
-    .all();
+    .groupBy(transactions.type);
   const income = rows.find((r) => r.type === "income")?.total ?? 0;
   const expenses = rows.find((r) => r.type === "expense")?.total ?? 0;
   return { income, expenses, balance: income - expenses };
 }
 
-export function getReportSummary(period: PeriodType, year: number, month?: number) {
+export async function getReportSummary(period: PeriodType, year: number, month?: number) {
   const range = getPeriodRange(period, year, month);
-  const current = periodTotals(range.startDate, range.endDate);
-  const previous = periodTotals(range.prevStartDate, range.prevEndDate);
+  const current = await periodTotals(range.startDate, range.endDate);
+  const previous = await periodTotals(range.prevStartDate, range.prevEndDate);
 
   const savingsRate = current.income > 0 ? (current.balance / current.income) * 100 : 0;
   const incomeChange = previous.income > 0 ? ((current.income - previous.income) / previous.income) * 100 : 0;
@@ -73,8 +72,8 @@ export function getReportSummary(period: PeriodType, year: number, month?: numbe
   };
 }
 
-export function getMonthlyEvolution(startDate: string, endDate: string) {
-  const rows = db
+export async function getMonthlyEvolution(startDate: string, endDate: string) {
+  const rows = await db
     .select({
       date: transactions.date,
       type: transactions.type,
@@ -82,8 +81,7 @@ export function getMonthlyEvolution(startDate: string, endDate: string) {
     })
     .from(transactions)
     .where(and(gte(transactions.date, startDate), lte(transactions.date, endDate)))
-    .orderBy(asc(transactions.date))
-    .all();
+    .orderBy(asc(transactions.date));
 
   const monthMap = new Map<string, { income: number; expenses: number }>();
 
@@ -110,9 +108,9 @@ export function getMonthlyEvolution(startDate: string, endDate: string) {
   return result;
 }
 
-export function getCategoryBreakdown(startDate: string, endDate: string) {
-  seedDefaultCategories();
-  const rows = db
+export async function getCategoryBreakdown(startDate: string, endDate: string) {
+  await seedDefaultCategories();
+  const rows = await db
     .select({
       categoryId: transactions.categoryId,
       categoryName: categories.name,
@@ -124,8 +122,7 @@ export function getCategoryBreakdown(startDate: string, endDate: string) {
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, startDate), lte(transactions.date, endDate)))
     .groupBy(transactions.categoryId)
-    .orderBy(sql`coalesce(sum(${transactions.amountPen}), 0) desc`)
-    .all();
+    .orderBy(sql`coalesce(sum(${transactions.amountPen}), 0) desc`);
 
   const grandTotal = rows.reduce((sum, r) => sum + r.total, 0);
   return rows.map((r) => ({
@@ -134,28 +131,28 @@ export function getCategoryBreakdown(startDate: string, endDate: string) {
   }));
 }
 
-export function getTopCategories(startDate: string, endDate: string) {
-  return getCategoryBreakdown(startDate, endDate).slice(0, 5);
+export async function getTopCategories(startDate: string, endDate: string) {
+  const breakdown = await getCategoryBreakdown(startDate, endDate);
+  return breakdown.slice(0, 5);
 }
 
-export function getFixedVsVariable(startDate: string, endDate: string) {
-  const rows = db
+export async function getFixedVsVariable(startDate: string, endDate: string) {
+  const rows = await db
     .select({
       isRecurring: transactions.isRecurring,
       total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)`,
     })
     .from(transactions)
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, startDate), lte(transactions.date, endDate)))
-    .groupBy(transactions.isRecurring)
-    .all();
+    .groupBy(transactions.isRecurring);
   return {
     fixed: rows.find((r) => r.isRecurring)?.total ?? 0,
     variable: rows.find((r) => !r.isRecurring)?.total ?? 0,
   };
 }
 
-export function getMonthlyBalance(startDate: string, endDate: string) {
-  const evolution = getMonthlyEvolution(startDate, endDate);
+export async function getMonthlyBalance(startDate: string, endDate: string) {
+  const evolution = await getMonthlyEvolution(startDate, endDate);
   return evolution.map((m) => ({
     month: m.month,
     income: m.income,
@@ -165,12 +162,12 @@ export function getMonthlyBalance(startDate: string, endDate: string) {
   }));
 }
 
-export function generateReportCsv(period: PeriodType, year: number, month?: number) {
+export async function generateReportCsv(period: PeriodType, year: number, month?: number) {
   const range = getPeriodRange(period, year, month);
-  const monthlyBalance = getMonthlyBalance(range.startDate, range.endDate);
-  const breakdown = getCategoryBreakdown(range.startDate, range.endDate);
-  const summary = getReportSummary(period, year, month);
-  const fixedVariable = getFixedVsVariable(range.startDate, range.endDate);
+  const monthlyBalance = await getMonthlyBalance(range.startDate, range.endDate);
+  const breakdown = await getCategoryBreakdown(range.startDate, range.endDate);
+  const summary = await getReportSummary(period, year, month);
+  const fixedVariable = await getFixedVsVariable(range.startDate, range.endDate);
 
   const lines: string[] = [];
 

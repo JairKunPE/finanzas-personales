@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const categoryId = Number(id);
-  const existing = getCategory(categoryId);
+  const existing = await getCategory(categoryId);
   if (!existing) return NextResponse.json(0);
-  return NextResponse.json(transactionsCount(categoryId));
+  return NextResponse.json(await transactionsCount(categoryId));
 }

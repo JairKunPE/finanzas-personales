@@ -4,6 +4,6 @@ import { listFixedExpenses } from "@/lib/db/transactions";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  return NextResponse.json(listFixedExpenses());
+export async function GET() {
+  return NextResponse.json(await listFixedExpenses());
 }

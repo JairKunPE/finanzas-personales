@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   const parsed = transactionQuerySchema.safeParse(body);
   const query = parsed.success ? parsed.data : { page: 1, pageSize: 10000 };
 
-  const csv = generateTransactionsCsv(query);
+  const csv = await generateTransactionsCsv(query);
 
   const now = new Date();
   const filename = `finanzas_transacciones_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}.csv`;

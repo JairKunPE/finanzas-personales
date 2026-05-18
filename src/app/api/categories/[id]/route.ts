@@ -17,21 +17,21 @@ function validationError(error: ZodError) {
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const categoryId = Number(id);
-  const existing = getCategory(categoryId);
+  const existing = await getCategory(categoryId);
   if (!existing) return notFound();
 
   const body = await request.json().catch(() => null);
   const parsed = categoryInputSchema.safeParse(body);
   if (!parsed.success) return validationError(parsed.error);
 
-  const updated = updateCategory(categoryId, parsed.data);
+  const updated = await updateCategory(categoryId, parsed.data);
   return NextResponse.json(updated);
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const categoryId = Number(id);
-  const existing = getCategory(categoryId);
+  const existing = await getCategory(categoryId);
   if (!existing) return notFound();
 
   if (existing.isDefault) {
@@ -39,14 +39,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   }
 
   const body = await request.json().catch(() => ({}));
-  const { reassignTo, deleteTransactions } = body;
+  const { reassignTo, deleteTransactions: shouldDeleteTransactions } = body;
 
   if (reassignTo) {
-    reassignTransactions(categoryId, Number(reassignTo));
-  } else if (deleteTransactions) {
-    deleteTransactionsByCategory(categoryId);
+    await reassignTransactions(categoryId, Number(reassignTo));
+  } else if (shouldDeleteTransactions) {
+    await deleteTransactionsByCategory(categoryId);
   }
 
-  softDeleteCategory(categoryId);
+  await softDeleteCategory(categoryId);
   return NextResponse.json({ success: true });
 }

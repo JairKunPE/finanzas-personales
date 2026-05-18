@@ -11,19 +11,19 @@ function validationError(error: ZodError) {
   return NextResponse.json({ message: "Datos invalidos", issues: error.issues.map((issue) => issue.message) }, { status: 400 });
 }
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const params = Object.fromEntries(request.nextUrl.searchParams.entries());
   const parsed = transactionQuerySchema.safeParse(params);
   if (!parsed.success) return validationError(parsed.error);
-  return NextResponse.json(listTransactions(parsed.data));
+  return NextResponse.json(await listTransactions(parsed.data));
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const parsed = transactionInputSchema.safeParse(body);
   if (!parsed.success) return validationError(parsed.error);
-  const settings = getCurrencySettings();
+  const settings = await getCurrencySettings();
   const input = parsed.data.currency === "USD" && !parsed.data.exchangeRate ? { ...parsed.data, exchangeRate: settings.usdToPen } : parsed.data;
-  const transaction = createTransaction(input);
+  const transaction = await createTransaction(input);
   return NextResponse.json(transaction, { status: 201 });
 }
