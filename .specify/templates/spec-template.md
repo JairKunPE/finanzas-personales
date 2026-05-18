@@ -77,6 +77,8 @@
 
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
+- What happens when local storage or SQLite access fails?
+- How does the feature preserve user control when exporting or backing up data?
 
 ## Requirements *(mandatory)*
 
@@ -87,16 +89,26 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-001**: System MUST [specific local capability, e.g., "record an expense"]
+- **FR-002**: System MUST [validation behavior, e.g., "reject negative amounts"]
+- **FR-003**: Users MUST be able to [key interaction, e.g., "edit a saved transaction"]
+- **FR-004**: System MUST [local data requirement, e.g., "persist entries in SQLite"]
+- **FR-005**: System MUST [export/privacy behavior, e.g., "include entries in CSV export"]
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-006**: System MUST support [NEEDS CLARIFICATION: CSV fields or date range not specified]
+- **FR-007**: System MUST handle [NEEDS CLARIFICATION: local data failure behavior not specified]
+
+### Constitution Alignment *(mandatory)*
+
+- **Privacy**: [Confirm data remains local and no accounts, servers, telemetry, or third-party APIs are introduced]
+- **Simplicity**: [Identify the minimal complete MVP path and deferred non-essential scope]
+- **UX**: [Define mobile, desktop, dark mode, and primary-flow responsiveness expectations]
+- **Exportability**: [Describe CSV export impact or confirm existing export remains complete]
+- **Stack**: [Confirm Next.js 15 App Router, TypeScript, Tailwind CSS 4, SQLite, Drizzle ORM]
+- **Maintainability**: [Describe separation of UI, logic, persistence, and typed contracts]
+- **Monetization**: [Confirm no payments, subscriptions, ads, tracking, or paywalls]
 
 ### Key Entities *(include if feature involves data)*
 

@@ -40,7 +40,20 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **Local privacy**: Confirm financial data remains local; no accounts, remote servers,
+  telemetry, or third-party APIs are required for the feature.
+- **Simplicity/MVP**: Identify the smallest complete user journey and justify any added
+  abstraction, automation, or dependency.
+- **UX first**: Define responsive behavior for mobile and desktop, dark mode support, and
+  any performance or interaction targets for the primary flow.
+- **Exportability**: State whether the feature creates or changes user data and how CSV
+  export remains complete and understandable.
+- **Pragmatic stack**: Confirm use of Next.js 15 App Router, TypeScript, Tailwind CSS 4,
+  SQLite, and Drizzle ORM; document any deviation as a constitution violation.
+- **Maintainability**: Describe separation between UI, business logic, persistence, and
+  typed data contracts.
+- **No monetization**: Confirm the feature introduces no payments, subscriptions, ads,
+  commercial tracking, or paywalls.
 
 ## Project Structure
 
