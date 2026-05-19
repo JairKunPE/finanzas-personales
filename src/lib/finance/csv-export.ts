@@ -40,6 +40,7 @@ function filterTransactionsInMemory(transactions: TransactionRow[], query: Trans
   return transactions.filter((t) => {
     if (query.type && t.type !== query.type) return false;
     if (query.categoryId && t.categoryId !== query.categoryId) return false;
+    if (query.fixed && !t.isRecurring) return false;
     if (query.from && t.date < query.from) return false;
     if (query.to && t.date > query.to) return false;
     return true;

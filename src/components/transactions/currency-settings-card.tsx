@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +19,12 @@ export function CurrencySettingsCard() {
   }, [data?.usdToPen, form]);
 
   async function onSubmit(values: FormValues) {
-    await updateUsdToPen(values.usdToPen);
+    try {
+      await updateUsdToPen(values.usdToPen);
+      toast.success("Tipo de cambio actualizado");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el tipo de cambio");
+    }
   }
 
   return (

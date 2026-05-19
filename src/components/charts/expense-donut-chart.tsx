@@ -13,6 +13,27 @@ export function ExpenseDonutChart({ data }: { data: Slice[] }) {
     return <EmptyState title="Sin gastos este mes" description="Registra gastos para ver su distribucion por categoria." />;
   }
 
+  if (data.length === 1) {
+    const [entry] = data;
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Gastos por categoria</CardTitle>
+        </CardHeader>
+        <div className="space-y-4">
+          <div className="rounded-2xl border bg-muted/30 p-5">
+            <p className="text-sm text-muted-foreground">Todo el gasto del mes esta concentrado en</p>
+            <p className="mt-1 text-xl font-bold" style={{ color: entry.categoryColor }}>{entry.categoryName}</p>
+            <p className="mt-3 text-3xl font-bold">{formatCurrency(entry.total)}</p>
+          </div>
+          <div className="h-3 rounded-full bg-muted">
+            <div className="h-full rounded-full" style={{ width: "100%", backgroundColor: entry.categoryColor }} />
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

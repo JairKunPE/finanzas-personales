@@ -11,6 +11,7 @@ export function TransactionExportButton() {
   const type = searchParams.get("type");
   const categoryId = searchParams.get("categoryId");
   const period = searchParams.get("period");
+  const fixed = searchParams.get("fixed");
   const from = searchParams.get("from");
   const to = searchParams.get("to");
   const month = searchParams.get("month");
@@ -19,6 +20,7 @@ export function TransactionExportButton() {
   if (type) body.type = type;
   if (categoryId) body.categoryId = categoryId;
   if (period) body.period = period;
+  if (fixed) body.fixed = fixed;
   if (from) body.from = from;
   if (to) body.to = to;
   if (month) body.month = month;

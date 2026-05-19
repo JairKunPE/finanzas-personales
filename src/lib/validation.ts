@@ -28,6 +28,7 @@ export const transactionQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().max(100).default(20),
   type: transactionTypeSchema.optional(),
   categoryId: z.coerce.number().int().positive().optional(),
+  fixed: z.enum(["1", "true"]).transform(() => true).optional(),
   period: z.enum(["current-month", "previous-month", "last-3-months", "last-year", "custom"]).optional(),
   month: z.string().regex(/^\d{2}$/).optional(),
   year: z.string().regex(/^\d{4}$/).optional(),

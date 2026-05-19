@@ -29,7 +29,7 @@ export default function ReportsPage() {
   const [year, setYear] = useState(String(currentYear));
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7).split("-")[1]);
 
-  const { data, error, isLoading } = useFullReport(period, year, period === "monthly" ? month : undefined);
+  const { data, error, isLoading, mutate } = useFullReport(period, year, period === "monthly" ? month : undefined);
 
   function handleExport() {
     const params = new URLSearchParams({ period, year });
@@ -38,7 +38,7 @@ export default function ReportsPage() {
   }
 
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState message={error.message} />;
+  if (error) return <ErrorState message={error.message} onRetry={() => mutate()} />;
 
   return (
     <div className="space-y-6">

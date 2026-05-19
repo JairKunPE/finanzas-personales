@@ -1,4 +1,4 @@
-const CACHE_NAME = "finanzas-cache-v1";
+const CACHE_NAME = "finanzas-cache-v2";
 const STATIC_ASSETS = [
   "/",
   "/manifest.webmanifest",
@@ -33,9 +33,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   if (url.pathname.startsWith("/api/")) {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkOnlyApi(request));
   } else if (request.destination === "document" && url.pathname !== "/") {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkOnlyDocument(request));
   } else {
     event.respondWith(cacheFirst(request));
   }
@@ -68,5 +68,24 @@ async function networkFirst(request) {
     const cached = await caches.match(request);
     if (cached) return cached;
     return caches.match("/");
+  }
+}
+
+async function networkOnlyApi(request) {
+  try {
+    return await fetch(request);
+  } catch {
+    return new Response(JSON.stringify({ message: "Sin conexion con el servidor. Reintenta en unos segundos." }), {
+      status: 503,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}
+
+async function networkOnlyDocument(request) {
+  try {
+    return await fetch(request);
+  } catch {
+    return (await caches.match(request)) || (await caches.match("/")) || new Response("Sin conexion", { status: 503 });
   }
 }

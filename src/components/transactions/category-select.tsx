@@ -7,16 +7,17 @@ import { useCategories } from "@/lib/api/categories";
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 export function CategorySelect({ value, onChange }: { value: number; onChange: (value: number) => void }) {
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [], error, isLoading } = useCategories();
 
   return (
     <select
       className="min-h-11 rounded-xl border bg-background px-3 text-sm"
       value={value || ""}
       onChange={(event) => onChange(Number(event.target.value))}
+      disabled={isLoading || Boolean(error)}
       required
     >
-      <option value="">Selecciona categoria</option>
+      <option value="">{error ? "Error cargando categorias" : isLoading ? "Cargando categorias..." : "Selecciona categoria"}</option>
       {categories.map((category) => {
         const Icon = iconMap[category.icon] || LucideIcons.CircleEllipsis;
         return (

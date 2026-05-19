@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { CategoryCard, type CategoryCardDto } from "@/components/categories/category-card";
 import { CategoryForm, type CategoryFormValues } from "@/components/categories/category-form";
@@ -18,39 +19,47 @@ export default function CategoriesPage() {
   const [deleting, setDeleting] = useState<(CategoryCardDto & { transactionsCount: number }) | null>(null);
 
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState message={error.message} />;
+  if (error) return <ErrorState message={error.message} onRetry={() => mutate()} />;
 
   async function handleCreate(values: CategoryFormValues) {
     await createCategory(values);
+    toast.success("Categoria creada");
     setCreating(false);
-    mutate();
+    await mutate();
   }
 
   async function handleEdit(values: CategoryFormValues) {
     if (!editing) return;
     await updateCategory(editing.id, values);
+    toast.success("Categoria actualizada");
     setEditing(null);
-    mutate();
+    await mutate();
   }
 
   async function handleReassign(targetId: number) {
     if (!deleting) return;
     await deleteCategoryWithReassign(deleting.id, targetId);
+    toast.success("Categoria eliminada y transacciones reasignadas");
     setDeleting(null);
-    mutate();
+    await mutate();
   }
 
   async function handleDeleteTransactions() {
     if (!deleting) return;
     await deleteCategoryWithTransactions(deleting.id);
+    toast.success("Categoria y transacciones eliminadas");
     setDeleting(null);
-    mutate();
+    await mutate();
   }
 
   async function confirmDelete(cat: CategoryCardDto) {
-    const res = await fetch(`/api/categories/${cat.id}/transactions-count`);
-    const count = res.ok ? await res.json() : 0;
-    setDeleting({ ...cat, transactionsCount: count });
+    try {
+      const res = await fetch(`/api/categories/${cat.id}/transactions-count`, { cache: "no-store" });
+      const count = res.ok ? await res.json() : 0;
+      setDeleting({ ...cat, transactionsCount: count });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo validar la categoria");
+    }
   }
 
   return (
@@ -122,8 +131,9 @@ export default function CategoriesPage() {
                 <div className="flex gap-2">
                   <Button type="button" variant="danger" onClick={async () => {
                     await removeCategory(deleting.id);
+                    toast.success("Categoria eliminada");
                     setDeleting(null);
-                    mutate();
+                    await mutate();
                   }}>Eliminar</Button>
                   <Button type="button" variant="secondary" onClick={() => setDeleting(null)}>Cancelar</Button>
                 </div>

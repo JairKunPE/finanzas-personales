@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { BudgetCard } from "@/components/budgets/budget-card";
 import { BudgetForm } from "@/components/budgets/budget-form";
@@ -29,12 +30,13 @@ export default function BudgetsPage() {
 
   async function handleSave(categoryId: number, _month: string, limitAmount: number) {
     await upsertBudget(categoryId, _month, limitAmount);
+    toast.success("Presupuesto guardado");
     setEditing(null);
-    mutate();
+    await mutate();
   }
 
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState message={error.message} />;
+  if (error) return <ErrorState message={error.message} onRetry={() => mutate()} />;
 
   return (
     <div className="space-y-6">

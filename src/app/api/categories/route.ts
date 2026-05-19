@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
 
+import { apiError } from "@/lib/api/server-error";
 import { createCategory, listActiveCategories } from "@/lib/db/categories";
 import { categoryInputSchema } from "@/lib/validation";
 
@@ -11,13 +13,24 @@ function validationError(error: ZodError) {
 }
 
 export async function GET() {
-  return NextResponse.json(await listActiveCategories());
+  try {
+    return NextResponse.json(await listActiveCategories());
+  } catch (error) {
+    return apiError(error, "No se pudieron cargar las categorias");
+  }
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const parsed = categoryInputSchema.safeParse(body);
   if (!parsed.success) return validationError(parsed.error);
-  const category = await createCategory(parsed.data);
-  return NextResponse.json(category, { status: 201 });
+  try {
+    const category = await createCategory(parsed.data);
+    revalidatePath("/categories");
+    revalidatePath("/transactions");
+    revalidatePath("/budgets");
+    return NextResponse.json(category, { status: 201 });
+  } catch (error) {
+    return apiError(error, "No se pudo crear la categoria");
+  }
 }

@@ -42,6 +42,7 @@ function filters(query: Partial<TransactionQuery>) {
   return and(
     query.type ? eq(transactions.type, query.type) : undefined,
     query.categoryId ? eq(transactions.categoryId, query.categoryId) : undefined,
+    query.fixed ? eq(transactions.isRecurring, true) : undefined,
     period.from ? gte(transactions.date, period.from) : undefined,
     period.to ? lte(transactions.date, period.to) : undefined,
   );
@@ -276,5 +277,5 @@ export async function expenseDistribution(month: string) {
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, start), lte(transactions.date, end)))
-    .groupBy(categories.id);
+    .groupBy(categories.id, categories.name, categories.color);
 }

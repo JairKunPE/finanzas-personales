@@ -17,10 +17,10 @@ export function TransactionList() {
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
   const query = params.toString() ? `?${params.toString()}` : "";
-  const { data, error, isLoading } = useTransactions(query);
+  const { data, error, isLoading, mutate } = useTransactions(query);
 
   if (isLoading) return <LoadingState label="Cargando transacciones..." />;
-  if (error) return <ErrorState message={error.message} />;
+  if (error) return <ErrorState message={error.message} onRetry={() => mutate()} />;
   if (!data || data.items.length === 0) return <EmptyState title="Sin transacciones" description="Agrega tu primer ingreso o gasto, o limpia los filtros activos." />;
 
   function goToPage(page: number) {

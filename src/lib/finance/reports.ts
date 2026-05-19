@@ -121,7 +121,7 @@ export async function getCategoryBreakdown(startDate: string, endDate: string) {
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, startDate), lte(transactions.date, endDate)))
-    .groupBy(transactions.categoryId)
+    .groupBy(transactions.categoryId, categories.name, categories.icon, categories.color)
     .orderBy(sql`coalesce(sum(${transactions.amountPen}), 0) desc`);
 
   const grandTotal = rows.reduce((sum, r) => sum + r.total, 0);
