@@ -4,8 +4,10 @@ import { eq } from "drizzle-orm";
 import { db, nowISO } from "@/lib/db";
 import { categories } from "@/lib/db/schema";
 import { defaultCategories } from "@/lib/finance/categories";
+import { ensureDefaultPassword } from "@/lib/auth/password";
 
 export async function seedDefaultCategories() {
+  await ensureDefaultPassword();
   for (const category of defaultCategories) {
     const existingRows = await db.select().from(categories).where(eq(categories.name, category.name)).limit(1);
     const existing = existingRows[0];

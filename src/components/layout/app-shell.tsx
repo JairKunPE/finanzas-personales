@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { BarChart3, Home, PlusCircle, ReceiptText, Tags, Wallet, LineChart } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -41,7 +42,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <p className="text-sm text-muted-foreground">App personal</p>
               <h1 className="text-xl font-bold">Finanzas Personales</h1>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <LogoutButton />
+              <ThemeToggle />
+            </div>
           </div>
         </header>
         <main className="flex-1 px-4 pb-28 pt-6 lg:px-8 lg:pb-6">{children}</main>

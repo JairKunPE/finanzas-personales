@@ -161,8 +161,18 @@ export async function recentTransactions(limit = 5) {
     .limit(limit);
 }
 
-export async function allTransactionsAscending() {
-  return db.select().from(transactions).orderBy(asc(transactions.date));
+export async function getAllTimeBalance() {
+  const rows = await db
+    .select({
+      income: sql<number>`coalesce(sum(case when ${transactions.type} = 'income' then ${transactions.amountPen} else 0 end), 0)`,
+      expenses: sql<number>`coalesce(sum(case when ${transactions.type} = 'expense' then ${transactions.amountPen} else 0 end), 0)`,
+    })
+    .from(transactions);
+  return {
+    totalIncome: rows[0]?.income ?? 0,
+    totalExpenses: rows[0]?.expenses ?? 0,
+    balance: (rows[0]?.income ?? 0) - (rows[0]?.expenses ?? 0),
+  };
 }
 
 export async function allTransactionsWithCategories() {

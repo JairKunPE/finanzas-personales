@@ -21,6 +21,7 @@
     "date-fns": "latest",
     "dotenv": "^17.4.2",
     "drizzle-orm": "latest",
+    "jose": "^6.2.3",
     "lucide-react": "latest",
     "next": "latest",
     "next-themes": "latest",

@@ -55,49 +55,51 @@ export async function listBudgetsWithSpent(month: string) {
   const start = `${month}-01`;
   const end = `${month}-31`;
 
-  const spentByCategory = await db
+  const spentSubquery = db
     .select({
       categoryId: transactions.categoryId,
       total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)`,
     })
     .from(transactions)
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, start), lte(transactions.date, end)))
-    .groupBy(transactions.categoryId);
+    .groupBy(transactions.categoryId)
+    .as("spent");
 
-  const spentMap = new Map(spentByCategory.map((row) => [row.categoryId, row.total]));
+  const rows = await db
+    .select({
+      budgetId: budgets.id,
+      categoryId: categories.id,
+      categoryName: categories.name,
+      categoryIcon: categories.icon,
+      categoryColor: categories.color,
+      limitAmount: sql<number>`coalesce(${budgets.limitAmount}, 0)`,
+      spent: sql<number>`coalesce(${spentSubquery.total}, 0)`,
+    })
+    .from(categories)
+    .leftJoin(budgets, and(eq(categories.id, budgets.categoryId), eq(budgets.month, month)))
+    .leftJoin(spentSubquery, eq(categories.id, spentSubquery.categoryId))
+    .where(isNull(categories.deletedAt))
+    .orderBy(asc(categories.name));
 
-  const allCats = await db.select().from(categories).where(isNull(categories.deletedAt)).orderBy(asc(categories.name));
-  const budgetRows = await db.select().from(budgets).where(eq(budgets.month, month));
-  const budgetMap = new Map(budgetRows.map((b) => [b.categoryId, b]));
-
-  const result: BudgetWithSpent[] = [];
-
-  for (const cat of allCats) {
-    const budget = budgetMap.get(cat.id);
-    const spent = spentMap.get(cat.id) ?? 0;
-    const limitAmount = budget?.limitAmount ?? 0;
+  return rows.map((row) => {
     let status: BudgetWithSpent["status"] = "no-budget";
-
-    if (budget) {
-      if (spent >= limitAmount) status = "over";
-      else if (spent >= limitAmount * 0.8) status = "warning";
+    if (row.budgetId !== null) {
+      if (row.spent >= row.limitAmount) status = "over";
+      else if (row.spent >= row.limitAmount * 0.8) status = "warning";
       else status = "safe";
     }
-
-    result.push({
-      id: budget?.id ?? null,
-      categoryId: cat.id,
-      categoryName: cat.name,
-      categoryIcon: cat.icon,
-      categoryColor: cat.color,
+    return {
+      id: row.budgetId,
+      categoryId: row.categoryId,
+      categoryName: row.categoryName,
+      categoryIcon: row.categoryIcon,
+      categoryColor: row.categoryColor,
       month,
-      limitAmount,
-      spent,
+      limitAmount: row.limitAmount,
+      spent: row.spent,
       status,
-    });
-  }
-
-  return result;
+    };
+  });
 }
 
 export async function countBudgetCategoriesNeedingAttention() {

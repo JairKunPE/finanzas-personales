@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { addMonths, endOfMonth, format as dateFnsFormat, startOfMonth, subMonths } from "date-fns";
 
 import { db } from "@/lib/db";
@@ -73,25 +73,20 @@ export async function getReportSummary(period: PeriodType, year: number, month?:
 }
 
 export async function getMonthlyEvolution(startDate: string, endDate: string) {
+  const monthExpr = sql<string>`left(${transactions.date}, 7)`;
+
   const rows = await db
     .select({
-      date: transactions.date,
-      type: transactions.type,
-      amountPen: transactions.amountPen,
+      month: monthExpr,
+      income: sql<number>`coalesce(sum(case when ${transactions.type} = 'income' then ${transactions.amountPen} else 0 end), 0)`,
+      expenses: sql<number>`coalesce(sum(case when ${transactions.type} = 'expense' then ${transactions.amountPen} else 0 end), 0)`,
     })
     .from(transactions)
     .where(and(gte(transactions.date, startDate), lte(transactions.date, endDate)))
-    .orderBy(asc(transactions.date));
+    .groupBy(monthExpr)
+    .orderBy(monthExpr);
 
-  const monthMap = new Map<string, { income: number; expenses: number }>();
-
-  for (const row of rows) {
-    const monthKey = row.date.slice(0, 7);
-    const entry = monthMap.get(monthKey) ?? { income: 0, expenses: 0 };
-    if (row.type === "income") entry.income += row.amountPen;
-    else entry.expenses += row.amountPen;
-    monthMap.set(monthKey, entry);
-  }
+  const monthMap = new Map(rows.map((r) => [r.month, { income: r.income, expenses: r.expenses }]));
 
   let cursor = startDate.slice(0, 7);
   const endKey = endDate.slice(0, 7);

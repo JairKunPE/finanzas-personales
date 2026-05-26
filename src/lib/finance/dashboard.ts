@@ -1,16 +1,16 @@
 import { currentMonthKey } from "@/lib/formats";
-import { calculateBalancePen, calculateMonthlyTotals } from "@/lib/finance/calculations";
+import { calculateMonthlyTotals } from "@/lib/finance/calculations";
 import { countBudgetCategoriesNeedingAttention } from "@/lib/db/budgets";
-import { allTransactionsAscending, currentMonthFixedVariableTotals, currentMonthTotals, expenseDistribution, recentTransactions } from "@/lib/db/transactions";
+import { currentMonthFixedVariableTotals, currentMonthTotals, expenseDistribution, getAllTimeBalance, recentTransactions } from "@/lib/db/transactions";
 
 export async function getDashboardSummary(month = currentMonthKey()) {
-  const allTransactions = await allTransactionsAscending();
+  const allTime = await getAllTimeBalance();
   const monthlyTotals = await currentMonthTotals(month);
   const monthly = calculateMonthlyTotals(monthlyTotals);
   const fixedVariable = await currentMonthFixedVariableTotals(month);
   return {
     month,
-    balance: calculateBalancePen(allTransactions),
+    balance: allTime.balance,
     monthlyIncome: monthly.income,
     monthlyExpenses: monthly.expenses,
     fixedExpenses: fixedVariable.fixed,

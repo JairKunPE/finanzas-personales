@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 import { getCurrencySettings, setUsdToPen } from "@/lib/db/settings";
 import { currencySettingsSchema } from "@/lib/validation";
@@ -15,5 +16,9 @@ export async function PATCH(request: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ message: "Tipo de cambio invalido", issues: parsed.error.issues.map((issue) => issue.message) }, { status: 400 });
   }
-  return NextResponse.json(await setUsdToPen(parsed.data.usdToPen));
+  const result = await setUsdToPen(parsed.data.usdToPen);
+  revalidatePath("/");
+  revalidatePath("/transactions");
+  revalidatePath("/reports");
+  return NextResponse.json(result);
 }
