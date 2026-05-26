@@ -58,7 +58,7 @@ export async function listBudgetsWithSpent(month: string) {
   const spentSubquery = db
     .select({
       categoryId: transactions.categoryId,
-      total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)`,
+      total: sql<number>`coalesce(sum(${transactions.amountPen}), 0)`.as("total"),
     })
     .from(transactions)
     .where(and(eq(transactions.type, "expense"), gte(transactions.date, start), lte(transactions.date, end)))
