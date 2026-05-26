@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
-import { BudgetCard } from "@/components/budgets/budget-card";
+import { BudgetDetailCard } from "@/components/budgets/budget-detail-card";
 import { BudgetForm } from "@/components/budgets/budget-form";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
@@ -12,9 +14,15 @@ import { useBudgets, upsertBudget } from "@/lib/api/budgets";
 import { currentMonthKey } from "@/lib/formats";
 
 export default function BudgetsPage() {
+  const router = useRouter();
   const [month, setMonth] = useState(currentMonthKey());
   const { data: budgets, error, isLoading, mutate } = useBudgets(month);
   const [editing, setEditing] = useState<{ categoryId: number; categoryName: string; limitAmount: number } | null>(null);
+
+  const [year, monthNum] = month.split("-").map(Number);
+  const currentMonthIndex = monthNum - 1;
+
+  const monthLabel = new Date(year, monthNum - 1, 1).toLocaleDateString("es", { month: "long", year: "numeric" });
 
   function handlePrevMonth() {
     const [y, m] = month.split("-").map(Number);
@@ -39,41 +47,48 @@ export default function BudgetsPage() {
   if (error) return <ErrorState message={error.message} onRetry={() => mutate()} />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Presupuestos</h1>
-        <p className="text-sm text-muted-foreground">Establece limites de gasto mensual por categoria</p>
+    <div className="space-y-5">
+      <div className="relative flex items-center justify-center">
+        <button
+          onClick={() => router.back()}
+          className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted"
+          aria-label="Atras"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <h2 className="text-lg font-bold">Metas de ahorro</h2>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-center gap-2">
         <button
-          type="button"
           onClick={handlePrevMonth}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border bg-card text-sm hover:bg-muted"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
+          aria-label="Mes anterior"
         >
-          &larr;
+          <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="min-w-[7rem] text-center font-semibold">
-          {new Date(month + "-01").toLocaleDateString("es", { month: "long", year: "numeric" })}
-        </span>
+        <span className="min-w-[8rem] text-center text-sm font-semibold capitalize">{monthLabel}</span>
         <button
-          type="button"
           onClick={handleNextMonth}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border bg-card text-sm hover:bg-muted"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
+          aria-label="Mes siguiente"
         >
-          &rarr;
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
       {!budgets || budgets.length === 0 ? (
         <EmptyState title="Sin categorias" description="Crea categorias para asignar presupuestos." />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-4">
           {budgets.map((b) => (
-            <BudgetCard
+            <BudgetDetailCard
               key={b.categoryId}
               budget={b}
-              onSetBudget={() => setEditing({ categoryId: b.categoryId, categoryName: b.categoryName, limitAmount: b.limitAmount })}
+              currentMonthIndex={currentMonthIndex}
+              onSetBudget={() =>
+                setEditing({ categoryId: b.categoryId, categoryName: b.categoryName, limitAmount: b.limitAmount })
+              }
             />
           ))}
         </div>

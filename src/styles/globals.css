@@ -1,38 +1,48 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --muted: #e2e8f0;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --primary: #2563eb;
-  --primary-foreground: #eff6ff;
-  --income: #059669;
-  --expense: #dc2626;
-  --warning: #d97706;
+  --background: #F8F9FA;
+  --foreground: #1A1A2E;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A2E;
+  --surface: #FFFFFF;
+  --surface-foreground: #1A1A2E;
+  --muted: #F1F3F5;
+  --muted-foreground: #8E93A0;
+  --border: #E8ECF0;
+  --primary: #F5A623;
+  --primary-foreground: #FFFFFF;
+  --secondary: #00C2A8;
+  --secondary-foreground: #FFFFFF;
+  --income: #00C2A8;
+  --expense: #E84545;
+  --warning: #F5A623;
   --radius: 1rem;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 .dark {
   color-scheme: dark;
   --background: #000000;
-  --foreground: #e2e8f0;
-  --card: #050505;
-  --card-foreground: #f8fafc;
-  --muted: #111111;
-  --muted-foreground: #94a3b8;
-  --border: #1f1f1f;
-  --primary: #60a5fa;
-  --primary-foreground: #0f172a;
-  --income: #34d399;
-  --expense: #fb7185;
-  --warning: #fbbf24;
+  --foreground: #F0F0F0;
+  --card: #1C1C1E;
+  --card-foreground: #F0F0F0;
+  --surface: #1C1C1E;
+  --surface-foreground: #F0F0F0;
+  --muted: #2C2C2E;
+  --muted-foreground: #98989E;
+  --border: #2C2C2E;
+  --primary: #F5A623;
+  --primary-foreground: #000000;
+  --secondary: #00C2A8;
+  --secondary-foreground: #000000;
+  --income: #00C2A8;
+  --expense: #FF6B6B;
+  --warning: #F5A623;
 }
 
 @theme inline {
@@ -40,30 +50,49 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-income: var(--income);
   --color-expense: var(--expense);
   --color-warning: var(--warning);
   --radius-xl: var(--radius);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
+  --font-sans: var(--font-sans);
 }
 
 * {
   border-color: var(--border);
 }
 
-body {
-  min-height: 100vh;
-  background: radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 16%, transparent), transparent 32rem), var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html {
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
-.dark body {
-  background: #000000;
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
 }
 
 a,
@@ -75,5 +104,5 @@ textarea {
 }
 
 button:active {
-  transform: scale(0.99);
+  transform: scale(0.97);
 }

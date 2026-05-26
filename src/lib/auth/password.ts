@@ -51,12 +51,17 @@ export async function verifyPassword(plain: string) {
 }
 
 export async function ensureDefaultPassword() {
-  const existing = await getStoredPasswordHash();
-  if (!existing) {
-    const defaultPassword = "admin";
-    await setPassword(defaultPassword);
-    console.log("🔑 Contrasena inicial configurada:", defaultPassword);
-    return true;
+  try {
+    const existing = await getStoredPasswordHash();
+    if (!existing) {
+      const defaultPassword = "admin";
+      await setPassword(defaultPassword);
+      console.log("🔑 Contrasena inicial configurada:", defaultPassword);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.warn("No se pudo verificar la contrasena por defecto (posiblemente la tabla settings no existe aun):", (error as Error).message);
+    return false;
   }
-  return false;
 }
