@@ -1,13 +1,10 @@
-import { randomBytes } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
 
 function getSecret() {
   const raw = process.env.AUTH_SECRET;
   if (raw) return new TextEncoder().encode(raw);
-  if (process.env.NODE_ENV === "development") {
-    const fallback = randomBytes(32).toString("hex");
-    console.warn("⚠️  AUTH_SECRET no definido. Usando secreto temporal para desarrollo:", fallback);
-    return new TextEncoder().encode(fallback);
+  if (process.env.NODE_ENV !== "production") {
+    return new TextEncoder().encode("dev_secret_fallback_12345");
   }
   throw new Error("AUTH_SECRET no esta definido en las variables de entorno. Agrega AUTH_SECRET a tu archivo .env");
 }
