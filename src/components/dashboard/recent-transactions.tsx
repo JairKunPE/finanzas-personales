@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis } from "@/lib/finance/icon-map";
 
 import type { TransactionRow } from "@/lib/db/transactions";
 import { formatCurrency, formatDate, formatOriginalCurrency } from "@/lib/formats";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 type RecentTransactionsProps = {
   transactions: TransactionRow[];
@@ -26,7 +24,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
 
       <div className="mt-3 divide-y divide-border">
         {transactions.map((tx) => {
-          const Icon = iconMap[tx.categoryIcon] || LucideIcons.CircleEllipsis;
+          const Icon = iconMap[tx.categoryIcon] || CircleEllipsis;
           const isIncome = tx.type === "income";
 
           return (

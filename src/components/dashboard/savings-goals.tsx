@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis } from "@/lib/finance/icon-map";
 
 import type { BudgetWithSpent } from "@/lib/db/budgets";
 import { formatCurrency } from "@/lib/formats";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 type SavingsGoalsProps = {
   budgets: BudgetWithSpent[];
@@ -34,7 +32,7 @@ export function SavingsGoals({ budgets }: SavingsGoalsProps) {
 
       <div className="grid grid-cols-2 gap-3">
         {goals.map((goal) => {
-          const Icon = iconMap[goal.categoryIcon] || LucideIcons.CircleEllipsis;
+          const Icon = iconMap[goal.categoryIcon] || CircleEllipsis;
           const pct = goal.limitAmount > 0 ? Math.min((goal.spent / goal.limitAmount) * 100, 100) : 0;
 
           return (

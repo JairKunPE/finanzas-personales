@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { AppProviders } from "@/components/app-providers";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AppShell } from "@/components/layout/app-shell";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { SwRegister } from "@/components/pwa/sw-register";
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <SwRegister />
         <AppProviders>
-          <AppShell>{children}</AppShell>
+          <ErrorBoundary>
+            <AppShell>{children}</AppShell>
+          </ErrorBoundary>
         </AppProviders>
         <div className="fixed bottom-4 left-4 right-4 z-50 lg:left-auto lg:w-72">
           <InstallPrompt />

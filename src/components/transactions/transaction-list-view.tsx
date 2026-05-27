@@ -2,12 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis, Search } from "@/lib/finance/icon-map";
 
 import type { TransactionRow } from "@/lib/db/transactions";
 import { formatCurrency, formatDate, formatOriginalCurrency } from "@/lib/formats";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 type TransactionListViewProps = {
   transactions: TransactionRow[];
@@ -52,7 +50,7 @@ export function TransactionListView({ transactions }: TransactionListViewProps) 
   return (
     <div className="space-y-4">
       <div className="relative">
-        <LucideIcons.Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           placeholder="Buscar movimientos..."
@@ -77,7 +75,7 @@ export function TransactionListView({ transactions }: TransactionListViewProps) 
             <div className="overflow-hidden rounded-3xl bg-surface shadow-sm">
               <div className="divide-y divide-border">
                 {txs.map((tx) => {
-                  const Icon = iconMap[tx.categoryIcon] || LucideIcons.CircleEllipsis;
+                  const Icon = iconMap[tx.categoryIcon] || CircleEllipsis;
                   const isIncome = tx.type === "income";
 
                   return (

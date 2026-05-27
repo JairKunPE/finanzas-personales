@@ -1,11 +1,9 @@
 "use client";
 
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis, Pencil, Trash2 } from "@/lib/finance/icon-map";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 export type CategoryCardDto = {
   id: number;
@@ -24,7 +22,7 @@ export function CategoryCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const Icon = iconMap[category.icon] || LucideIcons.CircleEllipsis;
+  const Icon = iconMap[category.icon] || CircleEllipsis;
 
   return (
     <div className="group relative rounded-2xl border bg-card p-5 shadow-sm transition-all hover:shadow-md">
@@ -44,11 +42,11 @@ export function CategoryCard({
       </div>
       <div className="mt-4 flex justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
         <Button type="button" variant="ghost" onClick={onEdit}>
-          <LucideIcons.Pencil className="h-4 w-4" />
+          <Pencil className="h-4 w-4" />
         </Button>
         {!category.isDefault ? (
           <Button type="button" variant="ghost" onClick={onDelete}>
-            <LucideIcons.Trash2 className="h-4 w-4 text-expense" />
+            <Trash2 className="h-4 w-4 text-expense" />
           </Button>
         ) : null}
       </div>

@@ -1,14 +1,12 @@
 "use client";
 
-import * as LucideIcons from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { iconMap, CircleEllipsis } from "@/lib/finance/icon-map";
 import { formatCurrency } from "@/lib/formats";
 import type { CategoryBreakdownItem } from "@/lib/api/reports";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 export function CategoryBreakdown({ data }: { data: CategoryBreakdownItem[] }) {
   if (data.length === 0) {
@@ -33,7 +31,7 @@ export function CategoryBreakdown({ data }: { data: CategoryBreakdownItem[] }) {
         </div>
         <div className="space-y-2">
           {data.map((item) => {
-            const Icon = iconMap[item.categoryIcon] || LucideIcons.CircleEllipsis;
+            const Icon = iconMap[item.categoryIcon] || CircleEllipsis;
             return (
               <div key={item.categoryName} className="flex items-center justify-between gap-3 rounded-xl bg-muted/50 px-3 py-2">
                 <div className="flex items-center gap-2">

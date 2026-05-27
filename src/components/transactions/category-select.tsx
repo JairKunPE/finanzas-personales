@@ -1,10 +1,8 @@
 "use client";
 
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis } from "@/lib/finance/icon-map";
 
 import { useCategories } from "@/lib/api/categories";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 export function CategorySelect({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const { data: categories = [], error, isLoading } = useCategories();
@@ -19,7 +17,7 @@ export function CategorySelect({ value, onChange }: { value: number; onChange: (
     >
       <option value="">{error ? "Error cargando categorias" : isLoading ? "Cargando categorias..." : "Selecciona categoria"}</option>
       {categories.map((category) => {
-        const Icon = iconMap[category.icon] || LucideIcons.CircleEllipsis;
+        const Icon = iconMap[category.icon] || CircleEllipsis;
         return (
           <option key={category.id} value={category.id}>
             {category.name}
@@ -31,7 +29,7 @@ export function CategorySelect({ value, onChange }: { value: number; onChange: (
 }
 
 export function CategoryBadge({ icon, color, name, size = "sm" }: { icon: string; color: string; name: string; size?: "sm" | "md" }) {
-  const Icon = iconMap[icon] || LucideIcons.CircleEllipsis;
+  const Icon = iconMap[icon] || CircleEllipsis;
   const iconSize = size === "md" ? "h-4 w-4" : "h-3 w-3";
   const textSize = size === "md" ? "text-sm" : "text-xs";
 

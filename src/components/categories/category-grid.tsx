@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis, Plus, Search } from "@/lib/finance/icon-map";
 
 import { CategoryForm, type CategoryFormValues } from "@/components/categories/category-form";
 import { DeleteCategoryDialog } from "@/components/categories/delete-category-dialog";
@@ -17,8 +17,6 @@ import {
   deleteCategoryWithReassign,
   deleteCategoryWithTransactions,
 } from "@/lib/api/categories";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -106,7 +104,7 @@ export function CategoryGrid() {
   return (
     <div className="space-y-5">
       <div className="relative">
-        <LucideIcons.Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           placeholder="Buscar categorias..."
@@ -118,7 +116,7 @@ export function CategoryGrid() {
 
       <div className="grid grid-cols-3 gap-3">
         {filtered.map((cat) => {
-          const Icon = iconMap[cat.icon] || LucideIcons.CircleEllipsis;
+          const Icon = iconMap[cat.icon] || CircleEllipsis;
           return (
             <div
               key={cat.id}
@@ -142,7 +140,7 @@ export function CategoryGrid() {
           onClick={openCreate}
           className="flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-muted-foreground/30 text-muted-foreground transition hover:border-primary hover:text-primary"
         >
-          <LucideIcons.Plus className="h-6 w-6" />
+          <Plus className="h-6 w-6" />
           <p className="text-center text-[11px] font-semibold leading-tight">Agregar</p>
         </button>
       </div>

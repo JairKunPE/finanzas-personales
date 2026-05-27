@@ -1,13 +1,11 @@
 "use client";
 
-import * as LucideIcons from "lucide-react";
+import { iconMap, CircleEllipsis, Pencil, Plus } from "@/lib/finance/icon-map";
 
 import { RingProgress } from "@/components/budgets/ring-progress";
 import { MonthlyBars } from "@/components/budgets/monthly-bars";
 import { formatCurrency } from "@/lib/formats";
 import type { BudgetWithSpentDto } from "@/lib/api/budgets";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
 
 type BudgetDetailCardProps = {
   budget: BudgetWithSpentDto;
@@ -31,7 +29,7 @@ function computeChange(current: number, previous: number): string | null {
 }
 
 export function BudgetDetailCard({ budget, onSetBudget, currentMonthIndex, prevSpent }: BudgetDetailCardProps) {
-  const Icon = iconMap[budget.categoryIcon] || LucideIcons.CircleEllipsis;
+  const Icon = iconMap[budget.categoryIcon] || CircleEllipsis;
   const hasBudget = budget.status !== "no-budget";
   const pct = hasBudget && budget.limitAmount > 0 ? Math.min((budget.spent / budget.limitAmount) * 100, 100) : 0;
   const change = prevSpent !== undefined ? computeChange(budget.spent, prevSpent) : null;
@@ -54,7 +52,7 @@ export function BudgetDetailCard({ budget, onSetBudget, currentMonthIndex, prevS
             <p className="text-sm text-muted-foreground">Asignar presupuesto</p>
           </div>
           <div className="ml-auto">
-            <LucideIcons.Plus className="h-5 w-5" />
+            <Plus className="h-5 w-5" />
           </div>
         </div>
       </button>
@@ -95,7 +93,7 @@ export function BudgetDetailCard({ budget, onSetBudget, currentMonthIndex, prevS
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-muted"
             aria-label="Editar meta"
           >
-            <LucideIcons.Pencil className="h-4 w-4 text-muted-foreground" />
+            <Pencil className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
 
