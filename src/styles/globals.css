@@ -5,63 +5,63 @@
 
 :root {
   color-scheme: light;
-  --background: #F8F9FA;
-  --foreground: #1A1A2E;
-  --card: #FFFFFF;
-  --card-foreground: #1A1A2E;
-  --surface: #FFFFFF;
-  --surface-foreground: #1A1A2E;
-  --muted: #F1F3F5;
-  --muted-foreground: #8E93A0;
-  --border: #E8ECF0;
-  --primary: #F5A623;
-  --primary-foreground: #FFFFFF;
-  --secondary: #00C2A8;
-  --secondary-foreground: #FFFFFF;
-  --income: #00C2A8;
-  --expense: #E84545;
-  --warning: #F5A623;
+  --background: 248 249 250;
+  --foreground: 26 26 46;
+  --card: 255 255 255;
+  --card-foreground: 26 26 46;
+  --surface: 255 255 255;
+  --surface-foreground: 26 26 46;
+  --muted: 241 243 245;
+  --muted-foreground: 142 147 160;
+  --border: 232 236 240;
+  --primary: 245 166 35;
+  --primary-foreground: 255 255 255;
+  --secondary: 0 194 168;
+  --secondary-foreground: 255 255 255;
+  --income: 0 194 168;
+  --expense: 232 69 69;
+  --warning: 245 166 35;
   --radius: 1rem;
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 .dark {
   color-scheme: dark;
-  --background: #000000;
-  --foreground: #F0F0F0;
-  --card: #1C1C1E;
-  --card-foreground: #F0F0F0;
-  --surface: #1C1C1E;
-  --surface-foreground: #F0F0F0;
-  --muted: #2C2C2E;
-  --muted-foreground: #98989E;
-  --border: #2C2C2E;
-  --primary: #F5A623;
-  --primary-foreground: #000000;
-  --secondary: #00C2A8;
-  --secondary-foreground: #000000;
-  --income: #00C2A8;
-  --expense: #FF6B6B;
-  --warning: #F5A623;
+  --background: 0 0 0;
+  --foreground: 240 240 240;
+  --card: 28 28 30;
+  --card-foreground: 240 240 240;
+  --surface: 28 28 30;
+  --surface-foreground: 240 240 240;
+  --muted: 44 44 46;
+  --muted-foreground: 152 152 158;
+  --border: 44 44 46;
+  --primary: 245 166 35;
+  --primary-foreground: 0 0 0;
+  --secondary: 0 194 168;
+  --secondary-foreground: 0 0 0;
+  --income: 0 194 168;
+  --expense: 255 107 107;
+  --warning: 245 166 35;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-surface: var(--surface);
-  --color-surface-foreground: var(--surface-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-income: var(--income);
-  --color-expense: var(--expense);
-  --color-warning: var(--warning);
+  --color-background: rgb(var(--background) / 1);
+  --color-foreground: rgb(var(--foreground) / 1);
+  --color-card: rgb(var(--card) / 1);
+  --color-card-foreground: rgb(var(--card-foreground) / 1);
+  --color-surface: rgb(var(--surface) / 1);
+  --color-surface-foreground: rgb(var(--surface-foreground) / 1);
+  --color-muted: rgb(var(--muted) / 1);
+  --color-muted-foreground: rgb(var(--muted-foreground) / 1);
+  --color-border: rgb(var(--border) / 1);
+  --color-primary: rgb(var(--primary) / 1);
+  --color-primary-foreground: rgb(var(--primary-foreground) / 1);
+  --color-secondary: rgb(var(--secondary) / 1);
+  --color-secondary-foreground: rgb(var(--secondary-foreground) / 1);
+  --color-income: rgb(var(--income) / 1);
+  --color-expense: rgb(var(--expense) / 1);
+  --color-warning: rgb(var(--warning) / 1);
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) * 1.5);
   --radius-3xl: calc(var(--radius) * 2);
@@ -69,7 +69,7 @@
 }
 
 * {
-  border-color: var(--border);
+  border-color: rgb(var(--border) / 1);
 }
 
 html {
@@ -80,8 +80,8 @@ html {
 body {
   min-height: 100vh;
   overflow-x: hidden;
-  background: var(--background);
-  color: var(--foreground);
+  background: rgb(var(--background) / 1);
+  color: rgb(var(--foreground) / 1);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
