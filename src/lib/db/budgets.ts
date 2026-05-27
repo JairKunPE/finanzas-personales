@@ -2,7 +2,6 @@ import { and, asc, eq, gte, isNull, lte, sql } from "drizzle-orm";
 
 import { db, nowISO } from "@/lib/db";
 import { budgets, categories, transactions } from "@/lib/db/schema";
-import { seedDefaultCategories } from "@/lib/db/seed";
 
 export type BudgetWithSpent = {
   id: number | null;
@@ -49,7 +48,6 @@ function getPreviousMonth(month: string) {
 }
 
 export async function listBudgetsWithSpent(month: string) {
-  await seedDefaultCategories();
   await ensureMonthBudgets(month);
 
   const start = `${month}-01`;

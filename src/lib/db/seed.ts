@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
 import { db, nowISO } from "@/lib/db";
 import { categories } from "@/lib/db/schema";
@@ -8,12 +8,10 @@ import { ensureDefaultPassword } from "@/lib/auth/password";
 
 export async function seedDefaultCategories() {
   await ensureDefaultPassword();
+  const [row] = await db.select({ value: count() }).from(categories);
+  if (row && row.value > 0) return;
   for (const category of defaultCategories) {
-    const existingRows = await db.select().from(categories).where(eq(categories.name, category.name)).limit(1);
-    const existing = existingRows[0];
-    if (!existing) {
-      await db.insert(categories).values({ ...category, isDefault: true, createdAt: nowISO() });
-    }
+    await db.insert(categories).values({ ...category, isDefault: true, createdAt: nowISO() });
   }
 }
 
