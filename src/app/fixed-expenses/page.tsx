@@ -14,7 +14,7 @@ export default async function FixedExpensesPage() {
   const groups = ["Servicios", "Suscripciones digitales", "Otros"] as const;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">Suscripciones, servicios, rentas y otros cobros recurrentes.</p>
         <div className="flex gap-2">

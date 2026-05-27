@@ -41,7 +41,7 @@ export default function ReportsPage() {
   if (error) return <ErrorState message={error.message} onRetry={() => mutate()} />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Reportes y Estadisticas</h1>

@@ -7,7 +7,7 @@ export default async function TransactionsPage() {
   const data = await listTransactions({ page: 1, pageSize: 1000 });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <TransactionListView transactions={data.items} />
     </div>
   );

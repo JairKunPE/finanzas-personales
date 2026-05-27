@@ -36,11 +36,11 @@ export function FixedVsVariableChart({ data }: { data: FixedVsVariableDto }) {
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-muted/50 p-3">
               <p className="text-sm text-muted-foreground">Gastos fijos</p>
-              <p className="text-lg font-bold" style={{ color: "#8b5cf6" }}>{formatCurrency(data.fixed)}</p>
+               <p className="text-lg font-bold text-purple-500">{formatCurrency(data.fixed)}</p>
             </div>
             <div className="rounded-xl bg-muted/50 p-3">
               <p className="text-sm text-muted-foreground">Gastos variables</p>
-              <p className="text-lg font-bold" style={{ color: "#f97316" }}>{formatCurrency(data.variable)}</p>
+               <p className="text-lg font-bold text-orange-500">{formatCurrency(data.variable)}</p>
             </div>
           </div>
         </>
