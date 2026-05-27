@@ -8,7 +8,6 @@ export default async function TransactionsPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-center text-lg font-bold">Movimientos</h2>
       <TransactionListView transactions={data.items} />
     </div>
   );

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { ChevronRight, CreditCard, Landmark } from "lucide-react";
 
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
+const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
+  CreditCard,
+  Landmark,
+};
 
 type CardData = {
   id: string;
@@ -39,7 +41,7 @@ export default function CardsPage() {
         </div>
         <div className="space-y-3">
           {items.map((card) => {
-            const Icon = iconMap[card.icon] || LucideIcons.CreditCard;
+            const Icon = iconMap[card.icon] || CreditCard;
             return (
               <div
                 key={card.id}

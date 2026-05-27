@@ -16,7 +16,6 @@ export default function EditTransactionPage() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-lg font-bold text-center">Editar transaccion</h2>
       <TransactionForm transaction={data} />
     </div>
   );

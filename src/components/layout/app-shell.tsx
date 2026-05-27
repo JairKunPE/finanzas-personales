@@ -10,13 +10,24 @@ import { SidebarDrawer } from "@/components/layout/sidebar-drawer";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
-  { href: "/", label: "Home", icon: Home },
+  { href: "/", label: "Dashboard", icon: Home },
   { href: "/transactions", label: "Movimientos", icon: ListFilter },
   { href: "/transactions/new", label: "", icon: Plus, isFab: true },
-  { href: "/budgets", label: "Metas", icon: Target },
+  { href: "/budgets", label: "Presupuestos", icon: Target },
   { href: "/reports", label: "Reportes", icon: FileBarChart },
   { href: "/categories", label: "Categorias", icon: Tags },
 ];
+
+const pageTitles: Record<string, string> = {
+  "/": "Dashboard",
+  "/transactions": "Movimientos",
+  "/categories": "Categorias",
+  "/budgets": "Presupuestos",
+  "/reports": "Reportes",
+  "/cards": "Tarjetas",
+  "/fixed-expenses": "Gastos Fijos",
+  "/transactions/new": "Nueva transaccion",
+};
 
 function greeting() {
   const hour = new Date().getHours();
@@ -30,6 +41,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const isAuthPage = pathname === "/login";
+
+  const pageTitle = pageTitles[pathname] ?? (pathname.startsWith("/transactions/") ? "Editar transaccion" : "");
 
   if (isAuthPage) {
     return <>{children}</>;
@@ -55,7 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3">
             <div className="leading-tight text-right">
               <p className="text-sm text-muted-foreground">{greeting()}!</p>
-              <p className="text-base font-bold">Usuario</p>
+              <p className="text-base font-bold">{pageTitle}</p>
             </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
               <User className="h-5 w-5 text-muted-foreground" />

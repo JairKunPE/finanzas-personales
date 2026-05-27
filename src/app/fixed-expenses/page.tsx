@@ -16,10 +16,7 @@ export default async function FixedExpensesPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Gastos Fijos</h2>
-          <p className="text-sm text-muted-foreground">Suscripciones, servicios, rentas y otros cobros recurrentes.</p>
-        </div>
+        <p className="text-sm text-muted-foreground">Suscripciones, servicios, rentas y otros cobros recurrentes.</p>
         <div className="flex gap-2">
           <CsvDownloadButton label="Exportar CSV" url="/api/export/fixed-expenses" method="POST" />
           <Link href="/transactions/new"><Button>Anadir suscripcion</Button></Link>

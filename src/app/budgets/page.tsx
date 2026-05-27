@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { PageHeader } from "@/components/ui/page-header";
 import { BudgetDetailCard } from "@/components/budgets/budget-detail-card";
 import { BudgetForm } from "@/components/budgets/budget-form";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -14,7 +14,6 @@ import { useBudgets, upsertBudget } from "@/lib/api/budgets";
 import { currentMonthKey } from "@/lib/formats";
 
 export default function BudgetsPage() {
-  const router = useRouter();
   const [month, setMonth] = useState(currentMonthKey());
   const { data: budgets, error, isLoading, mutate } = useBudgets(month);
   const [editing, setEditing] = useState<{ categoryId: number; categoryName: string; limitAmount: number } | null>(null);
@@ -53,16 +52,7 @@ export default function BudgetsPage() {
 
   return (
     <div className="space-y-5">
-      <div className="relative flex items-center justify-center">
-        <button
-          onClick={() => router.back()}
-          className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted"
-          aria-label="Atras"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <h2 className="text-lg font-bold">Metas de ahorro</h2>
-      </div>
+      <PageHeader title="Presupuestos" showBack />
 
       <div className="flex items-center justify-center gap-2">
         <button

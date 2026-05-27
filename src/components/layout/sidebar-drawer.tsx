@@ -3,9 +3,18 @@
 import { useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import * as LucideIcons from "lucide-react";
+import { CircleEllipsis, CreditCard, LayoutDashboard, ListFilter, LogOut, PieChart, Repeat, Tags, Target, User, X } from "lucide-react";
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>;
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  CircleEllipsis,
+  CreditCard,
+  LayoutDashboard,
+  ListFilter,
+  PieChart,
+  Repeat,
+  Tags,
+  Target,
+};
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: "LayoutDashboard" },
@@ -68,7 +77,7 @@ export function SidebarDrawer({ open, onClose }: SidebarDrawerProps) {
           <div className="flex items-center justify-between px-5 pt-5">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted">
-                <LucideIcons.User className="h-5 w-5 text-muted-foreground" />
+                <User className="h-5 w-5 text-muted-foreground" />
               </div>
               <div className="leading-tight">
                 <p className="text-base font-bold">Admin</p>
@@ -80,13 +89,13 @@ export function SidebarDrawer({ open, onClose }: SidebarDrawerProps) {
               className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted"
               aria-label="Cerrar menu"
             >
-              <LucideIcons.X className="h-4 w-4" />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
           <nav className="mt-8 flex-1 space-y-1 px-3">
             {menuItems.map((item) => {
-              const Icon = iconMap[item.icon] || LucideIcons.CircleEllipsis;
+              const Icon = iconMap[item.icon] || CircleEllipsis;
               const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
               return (
@@ -112,7 +121,7 @@ export function SidebarDrawer({ open, onClose }: SidebarDrawerProps) {
             className="mx-4 mb-6 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-primary hover:bg-muted transition"
             style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
           >
-            <LucideIcons.LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5" />
             Cerrar sesion
           </button>
         </div>
