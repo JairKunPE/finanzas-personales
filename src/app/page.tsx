@@ -7,7 +7,7 @@ import { FlowSummary } from "@/components/dashboard/flow-summary";
 import { SavingsGoals } from "@/components/dashboard/savings-goals";
 import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function DashboardPage() {
   const month = currentMonthKey();

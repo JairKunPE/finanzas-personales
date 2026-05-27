@@ -68,8 +68,6 @@ export default function CardsPage() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-lg font-bold text-center">Mis Tarjetas</h2>
-
       <div className="flex justify-center">
         <div className="inline-flex rounded-2xl bg-muted p-1">
           <button

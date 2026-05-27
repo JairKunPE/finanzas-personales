@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { listFixedExpenses } from "@/lib/db/transactions";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function FixedExpensesPage() {
   const data = await listFixedExpenses();

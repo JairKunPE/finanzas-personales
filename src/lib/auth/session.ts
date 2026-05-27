@@ -17,10 +17,13 @@ export function getSessionCookieName() {
 }
 
 export function getSessionCookieValue(token: string, clear = false) {
+  const isProd = process.env.NODE_ENV === "production";
+  const name = isProd ? `__Host-${COOKIE_NAME}` : COOKIE_NAME;
+  const secure = isProd ? "; Secure" : "";
   if (clear) {
-    return `${COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict`;
+    return `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict${secure}`;
   }
-  return `${COOKIE_NAME}=${token}; Path=/; Max-Age=${MAX_AGE_SECONDS}; HttpOnly; SameSite=Strict`;
+  return `${name}=${token}; Path=/; Max-Age=${MAX_AGE_SECONDS}; HttpOnly; SameSite=Strict${secure}`;
 }
 
 export async function createSessionToken() {
