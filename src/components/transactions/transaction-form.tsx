@@ -68,40 +68,43 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
   const errors = form.formState.errors;
 
   return (
-    <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-      <label className="grid gap-2 text-sm font-medium">
-        Tipo
-        <select className="min-h-11 rounded-xl border bg-background px-3" {...form.register("type")}>
-          <option value="expense">Gasto</option>
-          <option value="income">Ingreso</option>
-        </select>
-      </label>
-      <label className="grid gap-2 text-sm font-medium">
-        Monto
-        <input className="min-h-11 rounded-xl border bg-background px-3" type="number" step="0.01" min="0.01" {...form.register("amount", { valueAsNumber: true })} />
-        {errors.amount ? <span className="text-xs text-expense">{errors.amount.message}</span> : null}
-      </label>
-      <label className="grid gap-2 text-sm font-medium">
-        Descripcion
-        <input className="min-h-11 rounded-xl border bg-background px-3" {...form.register("description")} />
-        {errors.description ? <span className="text-xs text-expense">{errors.description.message}</span> : null}
-      </label>
-      <label className="grid gap-2 text-sm font-medium">
-        Categoria
-        <CategorySelect value={form.watch("categoryId")} onChange={(value) => form.setValue("categoryId", value, { shouldValidate: true })} />
-        {errors.categoryId ? <span className="text-xs text-expense">{errors.categoryId.message}</span> : null}
-      </label>
-      <label className="grid gap-2 text-sm font-medium">
-        Fecha
-        <input className="min-h-11 rounded-xl border bg-background px-3" type="date" {...form.register("date")} />
-        {errors.date ? <span className="text-xs text-expense">{errors.date.message}</span> : null}
-      </label>
-      <details className="rounded-2xl border bg-muted/20 p-4">
+    <form className="grid gap-5" onSubmit={form.handleSubmit(onSubmit)}>
+      <div className="rounded-3xl border bg-card p-5 space-y-5">
+        <label className="grid gap-2 text-sm font-medium">
+          <span className="text-muted-foreground">Tipo</span>
+          <select className="min-h-11 rounded-xl border bg-background px-3" {...form.register("type")}>
+            <option value="expense">Gasto</option>
+            <option value="income">Ingreso</option>
+          </select>
+        </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span className="text-muted-foreground">Monto</span>
+          <input className="min-h-11 rounded-xl border bg-background px-3" type="number" step="0.01" min="0.01" {...form.register("amount", { valueAsNumber: true })} />
+          {errors.amount ? <span className="text-xs text-expense">{errors.amount.message}</span> : null}
+        </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span className="text-muted-foreground">Descripcion</span>
+          <input className="min-h-11 rounded-xl border bg-background px-3" {...form.register("description")} />
+          {errors.description ? <span className="text-xs text-expense">{errors.description.message}</span> : null}
+        </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span className="text-muted-foreground">Categoria</span>
+          <CategorySelect value={form.watch("categoryId")} onChange={(value) => form.setValue("categoryId", value, { shouldValidate: true })} />
+          {errors.categoryId ? <span className="text-xs text-expense">{errors.categoryId.message}</span> : null}
+        </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span className="text-muted-foreground">Fecha</span>
+          <input className="min-h-11 rounded-xl border bg-background px-3" type="date" {...form.register("date")} />
+          {errors.date ? <span className="text-xs text-expense">{errors.date.message}</span> : null}
+        </label>
+      </div>
+
+      <details className="rounded-3xl border bg-card p-5">
         <summary className="cursor-pointer text-sm font-semibold">Opciones avanzadas: moneda y gasto fijo</summary>
         <div className="mt-4 grid gap-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="grid gap-2 text-sm font-medium">
-              Moneda
+              <span className="text-muted-foreground">Moneda</span>
               <select className="min-h-11 rounded-xl border bg-background px-3" {...form.register("currency")}>
                 <option value="PEN">Soles (PEN)</option>
                 <option value="USD">Dolares (USD)</option>
@@ -109,17 +112,17 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
             </label>
             {currency === "USD" ? (
               <label className="grid gap-2 text-sm font-medium">
-                Tipo de cambio USD a PEN (opcional)
+                <span className="text-muted-foreground">Tipo de cambio USD a PEN (opcional)</span>
                 <input className="min-h-11 rounded-xl border bg-background px-3" type="number" step="0.001" min="0.001" placeholder={String(currencySettings?.usdToPen ?? 3.75)} {...form.register("exchangeRate", { setValueAs: (value) => value === "" ? undefined : Number(value) })} />
               </label>
             ) : null}
           </div>
           {currency === "USD" ? (
-            <div className="rounded-xl border bg-background px-3 py-2 text-sm text-muted-foreground">
+            <div className="rounded-xl bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
               {formatOriginalCurrency(amount, "USD")} equivale a <strong className="text-foreground">{formatCurrency(amount * exchangeRate)}</strong>
             </div>
           ) : null}
-          <div className="rounded-2xl border bg-background p-4">
+          <div className="rounded-2xl bg-muted/20 p-4">
             <label className="flex items-center gap-3 text-sm font-medium">
               <input type="checkbox" className="h-4 w-4" disabled={type === "income"} {...form.register("isRecurring")} />
               Marcar como gasto fijo / suscripcion
@@ -128,14 +131,14 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
             {isRecurring ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <label className="grid gap-2 text-sm font-medium">
-                  Ciclo de facturacion
+                  <span className="text-muted-foreground">Ciclo de facturacion</span>
                   <select className="min-h-11 rounded-xl border bg-background px-3" {...form.register("billingCycle")}>
                     <option value="">Selecciona ciclo</option>
                     {Object.entries(billingCycleLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                   </select>
                   {errors.billingCycle ? <span className="text-xs text-expense">{errors.billingCycle.message}</span> : null}
                 </label>
-                <div className="rounded-xl border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                <div className="rounded-xl bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
                   <p>Equivalente mensual</p>
                   <p className="font-semibold text-foreground">{billingCycle ? formatCurrency((currency === "USD" ? amount * exchangeRate : amount) / ({ monthly: 1, quarterly: 3, semiannual: 6, annual: 12 }[billingCycle] ?? 1)) : "Selecciona ciclo"}</p>
                   <p className="mt-1">Proximo cobro: {billingCycle && date ? calculateNextBillingDate(date, billingCycle) : "pendiente"}</p>
@@ -145,9 +148,10 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
           </div>
         </div>
       </details>
-      <div className="flex gap-2">
-        <Button type="submit" disabled={form.formState.isSubmitting}>{transaction ? "Guardar cambios" : "Crear transaccion"}</Button>
-        <Button type="button" variant="secondary" onClick={() => router.push("/transactions")}>Cancelar</Button>
+
+      <div className="flex gap-3">
+        <Button type="submit" className="flex-1 rounded-full" disabled={form.formState.isSubmitting}>{transaction ? "Guardar cambios" : "Crear transaccion"}</Button>
+        <Button type="button" variant="secondary" className="rounded-full" onClick={() => router.push("/transactions")}>Cancelar</Button>
       </div>
     </form>
   );
