@@ -13,6 +13,7 @@ type BudgetDetailCardProps = {
   budget: BudgetWithSpentDto;
   onSetBudget: () => void;
   currentMonthIndex: number;
+  prevSpent?: number;
 };
 
 function progressColor(status: string) {
@@ -21,17 +22,19 @@ function progressColor(status: string) {
   return "#00C2A8";
 }
 
-function changeSign(): string {
-  const val = Math.floor(Math.random() * 30);
-  const dir = Math.random() > 0.5 ? "↓" : "↑";
-  return `${dir} ${val}%`;
+function computeChange(current: number, previous: number): string | null {
+  if (previous <= 0) return null;
+  const pct = Math.round(Math.abs((current - previous) / previous) * 100);
+  if (pct === 0) return "Sin cambio vs mes pasado";
+  const dir = current > previous ? "↑" : "↓";
+  return `${dir} ${pct}% que el mes pasado`;
 }
 
-export function BudgetDetailCard({ budget, onSetBudget, currentMonthIndex }: BudgetDetailCardProps) {
+export function BudgetDetailCard({ budget, onSetBudget, currentMonthIndex, prevSpent }: BudgetDetailCardProps) {
   const Icon = iconMap[budget.categoryIcon] || LucideIcons.CircleEllipsis;
   const hasBudget = budget.status !== "no-budget";
   const pct = hasBudget && budget.limitAmount > 0 ? Math.min((budget.spent / budget.limitAmount) * 100, 100) : 0;
-  const change = changeSign();
+  const change = prevSpent !== undefined ? computeChange(budget.spent, prevSpent) : null;
 
   if (!hasBudget) {
     return (
@@ -100,9 +103,11 @@ export function BudgetDetailCard({ budget, onSetBudget, currentMonthIndex }: Bud
           <MonthlyBars currentMonthIndex={currentMonthIndex} />
         </div>
 
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          {change} que el mes pasado
-        </p>
+        {change && (
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            {change}
+          </p>
+        )}
       </div>
     </div>
   );

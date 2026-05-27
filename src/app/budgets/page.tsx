@@ -22,6 +22,11 @@ export default function BudgetsPage() {
   const [year, monthNum] = month.split("-").map(Number);
   const currentMonthIndex = monthNum - 1;
 
+  const prevDate = new Date(year, monthNum - 2, 1);
+  const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
+  const { data: prevBudgets } = useBudgets(prevMonth);
+  const prevSpentMap = new Map((prevBudgets ?? []).map((b) => [b.categoryId, b.spent]));
+
   const monthLabel = new Date(year, monthNum - 1, 1).toLocaleDateString("es", { month: "long", year: "numeric" });
 
   function handlePrevMonth() {
@@ -86,6 +91,7 @@ export default function BudgetsPage() {
               key={b.categoryId}
               budget={b}
               currentMonthIndex={currentMonthIndex}
+              prevSpent={prevSpentMap.get(b.categoryId)}
               onSetBudget={() =>
                 setEditing({ categoryId: b.categoryId, categoryName: b.categoryName, limitAmount: b.limitAmount })
               }
