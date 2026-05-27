@@ -14,7 +14,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   if (transactions.length === 0) return null;
 
   return (
-    <section className="overflow-hidden rounded-3xl bg-surface shadow-sm">
+    <section className="overflow-hidden rounded-2xl bg-surface shadow-sm">
       <div className="flex items-center justify-between px-5 pt-5">
         <h3 className="text-lg font-bold">Movimientos</h3>
         <Link href="/transactions" className="text-sm font-semibold text-primary">

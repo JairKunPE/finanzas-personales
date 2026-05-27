@@ -8,7 +8,7 @@ type FlowSummaryProps = {
 
 export function FlowSummary({ income, expenses }: FlowSummaryProps) {
   return (
-    <div className="flex rounded-3xl bg-surface shadow-sm">
+    <div className="flex rounded-2xl bg-surface shadow-sm">
       <div className="flex flex-1 items-center justify-center gap-3 py-5">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-income/10">
           <ArrowDownRight className="h-5 w-5 text-income" />

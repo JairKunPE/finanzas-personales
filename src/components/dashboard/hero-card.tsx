@@ -8,7 +8,7 @@ export function HeroCard({ balance }: HeroCardProps) {
   const today = todayISODate();
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-orange-400 to-amber-500 p-6 text-primary-foreground shadow-lg">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-orange-400 to-amber-500 p-6 text-primary-foreground shadow-lg">
       <div className="absolute right-0 top-0 h-40 w-40 translate-x-10 -translate-y-10 rounded-full bg-white/10" />
       <div className="absolute bottom-0 right-0 h-24 w-24 translate-x-4 translate-y-4 rounded-full bg-white/5" />
 
