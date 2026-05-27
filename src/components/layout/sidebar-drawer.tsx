@@ -8,10 +8,13 @@ import * as LucideIcons from "lucide-react";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>;
 
 const menuItems = [
+  { href: "/", label: "Dashboard", icon: "LayoutDashboard" },
   { href: "/transactions", label: "Movimientos", icon: "ListFilter" },
   { href: "/categories", label: "Categorias", icon: "Tags" },
-  { href: "/", label: "Mis tarjetas", icon: "CreditCard" },
-  { href: "/reports", label: "Analisis de gastos", icon: "PieChart" },
+  { href: "/fixed-expenses", label: "Gastos Fijos", icon: "Repeat" },
+  { href: "/budgets", label: "Presupuestos", icon: "Target" },
+  { href: "/reports", label: "Reportes", icon: "PieChart" },
+  { href: "/cards", label: "Tarjetas", icon: "CreditCard" },
 ];
 
 type SidebarDrawerProps = {

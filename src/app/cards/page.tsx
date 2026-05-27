@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>>;
@@ -24,7 +23,6 @@ const sampleCards: CardData[] = [
 ];
 
 export default function CardsPage() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"debito" | "credito">("debito");
 
   const filtered = sampleCards.filter((c) => c.category === activeTab);
@@ -68,16 +66,7 @@ export default function CardsPage() {
 
   return (
     <div className="space-y-5">
-      <div className="relative flex items-center justify-center">
-        <button
-          onClick={() => router.back()}
-          className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted"
-          aria-label="Atras"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <h2 className="text-lg font-bold">Mis Tarjetas</h2>
-      </div>
+      <h2 className="text-lg font-bold text-center">Mis Tarjetas</h2>
 
       <div className="flex justify-center">
         <div className="inline-flex rounded-2xl bg-muted p-1">

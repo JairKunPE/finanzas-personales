@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { Bell, Home, ListFilter, Menu, Plus, Target, User } from "lucide-react";
+import { Bell, FileBarChart, Home, ListFilter, Menu, Plus, Tags, Target, User } from "lucide-react";
 
 import { SidebarDrawer } from "@/components/layout/sidebar-drawer";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -14,7 +14,8 @@ const navItems = [
   { href: "/transactions", label: "Movimientos", icon: ListFilter },
   { href: "/transactions/new", label: "", icon: Plus, isFab: true },
   { href: "/budgets", label: "Metas", icon: Target },
-  { href: "/categories", label: "Perfil", icon: User },
+  { href: "/reports", label: "Reportes", icon: FileBarChart },
+  { href: "/categories", label: "Categorias", icon: Tags },
 ];
 
 function greeting() {
@@ -27,6 +28,12 @@ function greeting() {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const isAuthPage = pathname === "/login";
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
