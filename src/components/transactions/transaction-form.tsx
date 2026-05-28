@@ -10,6 +10,7 @@ import { CategorySelect } from "@/components/transactions/category-select";
 import { transactionDefaults, transactionInputSchema } from "@/components/transactions/transaction-form-schema";
 import { zodResolver } from "@/lib/forms";
 import { createTransaction, updateTransaction, type TransactionDto } from "@/lib/api/transactions";
+import { useCards } from "@/lib/api/cards";
 import { useCurrencySettings } from "@/lib/api/settings";
 import { formatCurrency, formatOriginalCurrency } from "@/lib/formats";
 import { billingCycleLabels, calculateNextBillingDate } from "@/lib/finance/fixed-expenses";
@@ -34,6 +35,9 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
   const date = form.watch("date");
   const amount = form.watch("amount") || 0;
   const exchangeRate = form.watch("exchangeRate") || currencySettings?.usdToPen || 1;
+  const creditCardId = form.watch("creditCardId");
+  const { data: cards } = useCards();
+  const selectedCard = cards?.find((c) => c.id === creditCardId);
 
   useEffect(() => {
     if (!transaction && currency === "USD" && currencySettings?.usdToPen) {
@@ -42,9 +46,14 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
     if (currency === "PEN") {
       form.setValue("exchangeRate", 1, { shouldValidate: true });
     }
-    if (type === "income" && isRecurring) {
-      form.setValue("isRecurring", false, { shouldValidate: true });
-      form.setValue("billingCycle", undefined, { shouldValidate: true });
+    if (type === "income") {
+      if (isRecurring) {
+        form.setValue("isRecurring", false, { shouldValidate: true });
+        form.setValue("billingCycle", undefined, { shouldValidate: true });
+      }
+      if (form.watch("creditCardId") !== null) {
+        form.setValue("creditCardId", null, { shouldValidate: true });
+      }
     }
   }, [currency, currencySettings?.usdToPen, form, isRecurring, transaction, type]);
 
@@ -76,6 +85,7 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
             <option value="expense">Gasto</option>
             <option value="income">Ingreso</option>
           </select>
+          {errors.type ? <span className="text-xs text-expense">{errors.type.message}</span> : null}
         </label>
         <label className="grid gap-2 text-sm font-medium">
           <span className="text-muted-foreground">Monto</span>
@@ -97,6 +107,40 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
           <input className="min-h-11 rounded-xl border bg-background px-3" type="date" {...form.register("date")} />
           {errors.date ? <span className="text-xs text-expense">{errors.date.message}</span> : null}
         </label>
+
+        {type === "expense" ? (
+          <label className="grid gap-2 text-sm font-medium">
+            <span className="text-muted-foreground">Metodo de pago</span>
+            <select
+              className="min-h-11 rounded-xl border bg-background px-3"
+              value={creditCardId ? "card" : "cash"}
+              onChange={(e) => form.setValue("creditCardId", e.target.value === "card" ? (cards?.[0]?.id ?? null) : null, { shouldValidate: true })}
+            >
+              <option value="cash">Contado / Debito</option>
+              <option value="card">Tarjeta de credito</option>
+            </select>
+            {creditCardId && cards && cards.length > 0 ? (
+              <select
+                className="min-h-11 rounded-xl border bg-background px-3"
+                value={creditCardId ?? ""}
+                onChange={(e) => form.setValue("creditCardId", e.target.value ? Number(e.target.value) : null, { shouldValidate: true })}
+              >
+                {cards.map((card) => (
+                  <option key={card.id} value={card.id}>
+                    {card.name} (Limite: S/ {card.limitAmount.toLocaleString("es-PE")})
+                  </option>
+                ))}
+              </select>
+            ) : creditCardId ? (
+              <p className="text-xs text-muted-foreground">No hay tarjetas registradas</p>
+            ) : null}
+            {selectedCard ? (
+              <div className="rounded-xl bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                Corte: dia {selectedCard.statementDay} | Pago: dia {selectedCard.paymentDay}
+              </div>
+            ) : null}
+          </label>
+        ) : null}
       </div>
 
       <details className="rounded-3xl border bg-card p-5">
@@ -109,11 +153,13 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
                 <option value="PEN">Soles (PEN)</option>
                 <option value="USD">Dolares (USD)</option>
               </select>
+              {errors.currency ? <span className="text-xs text-expense">{errors.currency.message}</span> : null}
             </label>
             {currency === "USD" ? (
               <label className="grid gap-2 text-sm font-medium">
                 <span className="text-muted-foreground">Tipo de cambio USD a PEN (opcional)</span>
                 <input className="min-h-11 rounded-xl border bg-background px-3" type="number" step="0.001" min="0.001" placeholder={String(currencySettings?.usdToPen ?? 3.75)} {...form.register("exchangeRate", { setValueAs: (value) => value === "" ? undefined : Number(value) })} />
+              {errors.exchangeRate ? <span className="text-xs text-expense">{errors.exchangeRate.message}</span> : null}
               </label>
             ) : null}
           </div>
@@ -127,6 +173,7 @@ export function TransactionForm({ transaction }: { transaction?: TransactionDto 
               <input type="checkbox" className="h-4 w-4" disabled={type === "income"} {...form.register("isRecurring")} />
               Marcar como gasto fijo / suscripcion
             </label>
+            {errors.isRecurring ? <p className="mt-1 text-xs text-expense">{errors.isRecurring.message}</p> : null}
             {type === "income" ? <p className="mt-2 text-xs text-muted-foreground">Solo los gastos pueden marcarse como fijos.</p> : null}
             {isRecurring ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">

@@ -48,30 +48,33 @@ function filters(query: Partial<TransactionQuery>) {
   );
 }
 
+const transactionSelectFields = {
+  id: transactions.id,
+  type: transactions.type,
+  amount: transactions.amount,
+  originalAmount: transactions.originalAmount,
+  currency: transactions.currency,
+  exchangeRate: transactions.exchangeRate,
+  amountPen: transactions.amountPen,
+  description: transactions.description,
+  categoryId: transactions.categoryId,
+  creditCardId: transactions.creditCardId,
+  date: transactions.date,
+  isRecurring: transactions.isRecurring,
+  billingCycle: transactions.billingCycle,
+  nextBillingDate: transactions.nextBillingDate,
+  createdAt: transactions.createdAt,
+  updatedAt: transactions.updatedAt,
+  categoryName: categories.name,
+  categoryIcon: categories.icon,
+  categoryColor: categories.color,
+};
+
 export async function listTransactions(query: TransactionQuery) {
   const where = filters(query);
   const offset = (query.page - 1) * query.pageSize;
   const items = await db
-    .select({
-      id: transactions.id,
-      type: transactions.type,
-      amount: transactions.amount,
-      originalAmount: transactions.originalAmount,
-      currency: transactions.currency,
-      exchangeRate: transactions.exchangeRate,
-      amountPen: transactions.amountPen,
-      description: transactions.description,
-      categoryId: transactions.categoryId,
-      date: transactions.date,
-      isRecurring: transactions.isRecurring,
-      billingCycle: transactions.billingCycle,
-      nextBillingDate: transactions.nextBillingDate,
-      createdAt: transactions.createdAt,
-      updatedAt: transactions.updatedAt,
-      categoryName: categories.name,
-      categoryIcon: categories.icon,
-      categoryColor: categories.color,
-    })
+    .select(transactionSelectFields)
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(where)
@@ -85,26 +88,7 @@ export async function listTransactions(query: TransactionQuery) {
 
 export async function getTransaction(id: number) {
   const rows = await db
-    .select({
-      id: transactions.id,
-      type: transactions.type,
-      amount: transactions.amount,
-      originalAmount: transactions.originalAmount,
-      currency: transactions.currency,
-      exchangeRate: transactions.exchangeRate,
-      amountPen: transactions.amountPen,
-      description: transactions.description,
-      categoryId: transactions.categoryId,
-      date: transactions.date,
-      isRecurring: transactions.isRecurring,
-      billingCycle: transactions.billingCycle,
-      nextBillingDate: transactions.nextBillingDate,
-      createdAt: transactions.createdAt,
-      updatedAt: transactions.updatedAt,
-      categoryName: categories.name,
-      categoryIcon: categories.icon,
-      categoryColor: categories.color,
-    })
+    .select(transactionSelectFields)
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(eq(transactions.id, id))
@@ -135,26 +119,7 @@ export async function deleteTransaction(id: number) {
 
 export async function recentTransactions(limit = 5) {
   return db
-    .select({
-      id: transactions.id,
-      type: transactions.type,
-      amount: transactions.amount,
-      originalAmount: transactions.originalAmount,
-      currency: transactions.currency,
-      exchangeRate: transactions.exchangeRate,
-      amountPen: transactions.amountPen,
-      description: transactions.description,
-      categoryId: transactions.categoryId,
-      date: transactions.date,
-      isRecurring: transactions.isRecurring,
-      billingCycle: transactions.billingCycle,
-      nextBillingDate: transactions.nextBillingDate,
-      createdAt: transactions.createdAt,
-      updatedAt: transactions.updatedAt,
-      categoryName: categories.name,
-      categoryIcon: categories.icon,
-      categoryColor: categories.color,
-    })
+    .select(transactionSelectFields)
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .orderBy(desc(transactions.date), desc(transactions.id))
@@ -177,26 +142,7 @@ export async function getAllTimeBalance() {
 
 export async function allTransactionsWithCategories() {
   return db
-    .select({
-      id: transactions.id,
-      type: transactions.type,
-      amount: transactions.amount,
-      originalAmount: transactions.originalAmount,
-      currency: transactions.currency,
-      exchangeRate: transactions.exchangeRate,
-      amountPen: transactions.amountPen,
-      description: transactions.description,
-      categoryId: transactions.categoryId,
-      date: transactions.date,
-      isRecurring: transactions.isRecurring,
-      billingCycle: transactions.billingCycle,
-      nextBillingDate: transactions.nextBillingDate,
-      createdAt: transactions.createdAt,
-      updatedAt: transactions.updatedAt,
-      categoryName: categories.name,
-      categoryIcon: categories.icon,
-      categoryColor: categories.color,
-    })
+    .select(transactionSelectFields)
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .orderBy(asc(transactions.date));
@@ -204,26 +150,7 @@ export async function allTransactionsWithCategories() {
 
 export async function listFixedExpenses() {
   const rows = await db
-    .select({
-      id: transactions.id,
-      type: transactions.type,
-      amount: transactions.amount,
-      originalAmount: transactions.originalAmount,
-      currency: transactions.currency,
-      exchangeRate: transactions.exchangeRate,
-      amountPen: transactions.amountPen,
-      description: transactions.description,
-      categoryId: transactions.categoryId,
-      date: transactions.date,
-      isRecurring: transactions.isRecurring,
-      billingCycle: transactions.billingCycle,
-      nextBillingDate: transactions.nextBillingDate,
-      createdAt: transactions.createdAt,
-      updatedAt: transactions.updatedAt,
-      categoryName: categories.name,
-      categoryIcon: categories.icon,
-      categoryColor: categories.color,
-    })
+    .select(transactionSelectFields)
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
     .where(and(eq(transactions.type, "expense"), eq(transactions.isRecurring, true), isNotNull(transactions.billingCycle)))

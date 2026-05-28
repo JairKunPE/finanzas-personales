@@ -11,6 +11,7 @@ export const transactionDefaults: TransactionInput = {
   exchangeRate: 1,
   description: "",
   categoryId: 0,
+  creditCardId: null,
   date: todayISODate(),
   isRecurring: false,
   billingCycle: undefined,

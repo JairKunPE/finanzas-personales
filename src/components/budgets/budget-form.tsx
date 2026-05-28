@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { zodResolver } from "@/lib/forms";
+
+const limitAmountFormSchema = z.object({
+  limitAmount: z.number({ message: "Ingresa un monto valido" }).positive("El monto debe ser mayor a 0"),
+});
+
+type BudgetFormValues = z.infer<typeof limitAmountFormSchema>;
 
 export function BudgetForm({
   initialAmount,
@@ -15,30 +23,23 @@ export function BudgetForm({
   onSave: (limitAmount: number) => void;
   onCancel: () => void;
 }) {
-  const [amount, setAmount] = useState(initialAmount ? String(initialAmount) : "");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const form = useForm<BudgetFormValues>({
+    resolver: zodResolver(limitAmountFormSchema),
+    defaultValues: { limitAmount: initialAmount ?? (undefined as unknown as number) },
+  });
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    const value = Number.parseFloat(amount);
-    if (Number.isNaN(value) || value <= 0) {
-      setError("Ingresa un monto valido mayor a 0");
-      return;
-    }
-    setError("");
-    setSaving(true);
+  const errors = form.formState.errors;
+
+  async function handleSubmit(values: BudgetFormValues) {
     try {
-      await onSave(value);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al guardar");
-    } finally {
-      setSaving(false);
+      await onSave(values.limitAmount);
+    } catch {
+      // errors handled by parent
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       <div>
         <p className="font-semibold">{initialAmount ? "Editar presupuesto" : "Asignar presupuesto"}</p>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -54,16 +55,15 @@ export function BudgetForm({
             type="number"
             step="0.01"
             min="0.01"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            {...form.register("limitAmount", { valueAsNumber: true })}
             placeholder="0.00"
             autoFocus
           />
         </div>
-        {error ? <span className="text-xs text-expense">{error}</span> : null}
+        {errors.limitAmount ? <span className="text-xs text-expense">{errors.limitAmount.message}</span> : null}
       </label>
       <div className="flex gap-2">
-        <Button type="submit" disabled={saving}>{initialAmount ? "Guardar" : "Asignar"}</Button>
+        <Button type="submit" disabled={form.formState.isSubmitting}>{initialAmount ? "Guardar" : "Asignar"}</Button>
         <Button type="button" variant="secondary" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>

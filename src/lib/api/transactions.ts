@@ -12,6 +12,7 @@ export type TransactionDto = Omit<TransactionInput, "billingCycle"> & {
   isRecurring: boolean;
   billingCycle?: "monthly" | "quarterly" | "semiannual" | "annual" | null;
   nextBillingDate?: string | null;
+  creditCardId?: number | null;
   createdAt: string;
   updatedAt: string | null;
   categoryName: string;

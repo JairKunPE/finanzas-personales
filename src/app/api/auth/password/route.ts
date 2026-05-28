@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { verifyPassword, setPassword } from "@/lib/auth/password";
-import { createSessionToken, getSessionCookieValue } from "@/lib/auth/session";
+import { createAccessToken, createRefreshToken, setBothTokenCookies } from "@/lib/auth/session";
 
 export async function PATCH(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -23,8 +23,10 @@ export async function PATCH(request: NextRequest) {
 
   await setPassword(newPassword);
 
-  const token = await createSessionToken();
+  const accessToken = await createAccessToken();
+  const refreshToken = await createRefreshToken();
+
   const response = NextResponse.json({ success: true });
-  response.headers.set("Set-Cookie", getSessionCookieValue(token));
+  setBothTokenCookies(response, accessToken, refreshToken);
   return response;
 }

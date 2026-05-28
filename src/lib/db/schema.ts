@@ -29,6 +29,7 @@ export const transactions = pgTable(
     amountPen: doublePrecision("amount_pen").notNull().default(0),
     description: text("description").notNull(),
     categoryId: integer("category_id").notNull().references(() => categories.id),
+    creditCardId: integer("credit_card_id").references(() => creditCards.id),
     date: text("date").notNull(),
     isRecurring: boolean("is_recurring").notNull().default(false),
     billingCycle: text("billing_cycle", { enum: ["monthly", "quarterly", "semiannual", "annual"] }),
@@ -40,6 +41,21 @@ export const transactions = pgTable(
     dateIdx: index("transactions_date_idx").on(table.date),
     categoryIdx: index("transactions_category_idx").on(table.categoryId),
   }),
+);
+
+export const creditCards = pgTable(
+  "credit_cards",
+  {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    limitAmount: doublePrecision("limit_amount").notNull(),
+    statementDay: integer("statement_day").notNull(),
+    paymentDay: integer("payment_day").notNull(),
+    color: text("color").notNull().default("#64748b"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at"),
+    deletedAt: text("deleted_at"),
+  },
 );
 
 export const settings = pgTable("settings", {
@@ -65,5 +81,6 @@ export const budgets = pgTable(
 
 export type Category = typeof categories.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
+export type CreditCard = typeof creditCards.$inferSelect;
 export type Budget = typeof budgets.$inferSelect;
 export type Setting = typeof settings.$inferSelect;

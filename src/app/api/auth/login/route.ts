@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { verifyPassword } from "@/lib/auth/password";
-import { createSessionToken, getSessionCookieValue } from "@/lib/auth/session";
+import { createAccessToken, createRefreshToken, setBothTokenCookies } from "@/lib/auth/session";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const MAX_ATTEMPTS = 5;
@@ -37,8 +37,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Contrasena incorrecta" }, { status: 401 });
   }
 
-  const token = await createSessionToken();
+  const accessToken = await createAccessToken();
+  const refreshToken = await createRefreshToken();
+
   const response = NextResponse.json({ success: true });
-  response.headers.set("Set-Cookie", getSessionCookieValue(token));
+  setBothTokenCookies(response, accessToken, refreshToken);
   return response;
 }

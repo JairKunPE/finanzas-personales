@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { IconSelector } from "@/components/categories/icon-selector";
 import { ColorSelector } from "@/components/categories/color-selector";
+import { zodResolver } from "@/lib/forms";
+import { categoryInputSchema } from "@/lib/validation";
 
-export type CategoryFormValues = {
-  name: string;
-  icon: string;
-  color: string;
-};
+export type CategoryFormValues = z.infer<typeof categoryInputSchema>;
 
 export function CategoryForm({
   initial,
@@ -21,64 +20,52 @@ export function CategoryForm({
   onSave: (values: CategoryFormValues) => void;
   onCancel: () => void;
 }) {
-  const [name, setName] = useState(initial?.name ?? "");
-  const [icon, setIcon] = useState(initial?.icon ?? "CircleEllipsis");
-  const [color, setColor] = useState(initial?.color ?? "#64748b");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const form = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryInputSchema),
+    defaultValues: {
+      name: initial?.name ?? "",
+      icon: initial?.icon ?? "CircleEllipsis",
+      color: initial?.color ?? "#64748b",
+    },
+  });
 
-  useEffect(() => {
-    if (initial) {
-      setName(initial.name);
-      setIcon(initial.icon);
-      setColor(initial.color);
-    }
-  }, [initial]);
+  const errors = form.formState.errors;
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    const trimmed = name.trim();
-    if (!trimmed) {
-      setError("El nombre es obligatorio");
-      return;
-    }
-    setError("");
-    setSaving(true);
+  async function handleSubmit(values: CategoryFormValues) {
     try {
-      await onSave({ name: trimmed, icon, color });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al guardar");
-    } finally {
-      setSaving(false);
+      await onSave(values);
+    } catch {
+      // errors handled by parent
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       <label className="grid gap-2 text-sm font-medium">
         Nombre
         <input
           className="min-h-11 rounded-xl border bg-background px-3"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          {...form.register("name")}
           placeholder="Nombre de la categoria"
           autoFocus
         />
-        {error ? <span className="text-xs text-expense">{error}</span> : null}
+        {errors.name ? <span className="text-xs text-expense">{errors.name.message}</span> : null}
       </label>
 
       <label className="grid gap-2 text-sm font-medium">
         Icono
-        <IconSelector value={icon} onChange={setIcon} />
+        <IconSelector value={form.watch("icon")} onChange={(value) => form.setValue("icon", value, { shouldValidate: true })} />
+        {errors.icon ? <span className="text-xs text-expense">{errors.icon.message}</span> : null}
       </label>
 
       <label className="grid gap-2 text-sm font-medium">
         Color
-        <ColorSelector value={color} onChange={setColor} />
+        <ColorSelector value={form.watch("color")} onChange={(value) => form.setValue("color", value, { shouldValidate: true })} />
+        {errors.color ? <span className="text-xs text-expense">{errors.color.message}</span> : null}
       </label>
 
       <div className="flex gap-2 pt-2">
-        <Button type="submit" disabled={saving}>{initial ? "Guardar cambios" : "Crear categoria"}</Button>
+        <Button type="submit" disabled={form.formState.isSubmitting}>{initial ? "Guardar cambios" : "Crear categoria"}</Button>
         <Button type="button" variant="secondary" onClick={onCancel}>Cancelar</Button>
       </div>
     </form>

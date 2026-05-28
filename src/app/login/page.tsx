@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit } = useForm<LoginForm>({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -72,6 +72,7 @@ export default function LoginPage() {
               className="w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               {...register("password")}
             />
+            {errors.password && <p className="mt-1 text-xs text-expense">{errors.password.message}</p>}
           </div>
 
           {error && <p className="text-center text-sm text-expense">{error}</p>}

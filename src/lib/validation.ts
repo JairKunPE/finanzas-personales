@@ -11,6 +11,7 @@ export const transactionInputSchema = z.object({
   exchangeRate: z.number().positive("El tipo de cambio debe ser mayor a 0").optional(),
   description: z.string().trim().min(1, "La descripcion es obligatoria"),
   categoryId: z.number().int().positive("Selecciona una categoria"),
+  creditCardId: z.number().int().positive().nullable().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Usa una fecha valida"),
   isRecurring: z.boolean(),
   billingCycle: billingCycleSchema.optional(),
@@ -52,5 +53,14 @@ export const budgetInputSchema = z.object({
   limitAmount: z.number().positive(),
 });
 
+export const creditCardInsertSchema = z.object({
+  name: z.string().trim().min(1, "El nombre es obligatorio"),
+  limitAmount: z.number({ message: "Ingresa un monto valido" }).positive("El monto debe ser mayor a 0"),
+  statementDay: z.number().int().min(1, "Dia 1-31").max(31, "Dia 1-31"),
+  paymentDay: z.number().int().min(1, "Dia 1-31").max(31, "Dia 1-31"),
+  color: z.string().trim().min(1),
+});
+
 export type TransactionInput = z.infer<typeof transactionInputSchema>;
 export type TransactionQuery = z.infer<typeof transactionQuerySchema>;
+export type CreditCardInsert = z.infer<typeof creditCardInsertSchema>;

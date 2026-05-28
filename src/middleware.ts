@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getSessionCookieName, verifySessionToken } from "@/lib/auth/session";
+import { createAccessToken, getAccessCookieName, getRefreshCookieName, verifyToken } from "@/lib/auth/session";
 
 const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/status"];
 
@@ -11,19 +11,38 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const cookieName = getSessionCookieName();
-  const token = request.cookies.get(cookieName)?.value;
+  const accessCookieName = getAccessCookieName();
+  const refreshCookieName = getRefreshCookieName();
 
-  if (!token || !(await verifySessionToken(token))) {
-    if (pathname.startsWith("/api/")) {
-      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
-    }
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+  const accessToken = request.cookies.get(accessCookieName)?.value;
+  const refreshToken = request.cookies.get(refreshCookieName)?.value;
+
+  if (accessToken && (await verifyToken(accessToken))) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  if (refreshToken && (await verifyToken(refreshToken))) {
+    const newAccessToken = await createAccessToken();
+    const response = pathname.startsWith("/api/")
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL(pathname, request.url));
+    response.cookies.set(accessCookieName, newAccessToken, {
+      path: "/",
+      maxAge: 60 * 15,
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+    return response;
+  }
+
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+  }
+
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("redirect", pathname);
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
